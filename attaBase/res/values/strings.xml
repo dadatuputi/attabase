@@ -1,0 +1,26 @@
+<resources>
+
+    <string name="app_name">attaBase</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">attaBase</string>
+    <string name="edit_message">Enter a message</string>
+    <string name="button_send">Send</string>
+    <string name="title_activity_display_message">My Message</string>
+    <string name="title_activity_show_all_entries">ShowAllEntries</string>
+    <string name="importing">We are performing the initial import of the base data. This may take several minutes, depending on your phone. This only needs to be performed once.</string>
+    <string name="bases">Bases Imported:</string>
+    <string name="locations">Locations Imported: </string>
+    <string name="zero">0</string>
+    <string name="initial_import_completed">Initial Import Completed</string>
+    <string name="start_screen_uninitialized">Welcome! This is the first time you\'ve run attaBase.\n\nWe need to perform an initial import. Tap &quot;Import&quot; below to continue.</string>
+    <string name="button_import">Import</string>
+    <string name="button_continue">Continue</string>
+    <string name="import_completed_message">Initial import completed. Please continue.</string>
+    <string name="title_base_detail">Base Detail</string>
+    <string name="title_base_list">Bases</string>
+    <string name="title_activity_activity_base_viewer">ActivityBaseViewer</string>
+    <string name="title_activity_activity_home">attaBase Home</string>
+    <string name="title_activity_activity_wizard">ActivityWizard</string>
+
+</resources>
