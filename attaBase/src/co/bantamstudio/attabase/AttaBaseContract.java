@@ -4,6 +4,12 @@ import android.provider.BaseColumns;
 
 public class AttaBaseContract {
 	
+	// STATICS
+	public static final int LEFT = -1;
+	public static final int RIGHT = 1;
+	public static final int NO_BASE = -1;
+	public static final int NO_SERVICE = -1;
+	
 	public static final String IMPORT_SOURCE_CSV = "attaBase.csv"; 
 	public static final String APP_STRING = "co.bantamstudio.attabase";
 	
