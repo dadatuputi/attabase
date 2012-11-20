@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="co.bantamstudio.attabase"
     android:versionCode="1"
@@ -12,7 +13,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ActivityMain"
+            android:name="co.bantamstudio.attabase.ActivityHome"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,53 +22,58 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ActivityDisplayMessage"
+            android:name="co.bantamstudio.attabase.ActivityDisplayMessage"
             android:label="@string/title_activity_display_message" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="co.bantamstudio.attabase.MainActivity" />
         </activity>
         <activity
-            android:name=".ActivityImportCSV"
+            android:name="co.bantamstudio.attabase.ActivityImportCSV"
             android:label="@string/title_activity_show_all_entries" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="co.bantamstudio.attabase.MainActivity" />
         </activity>
         <activity
-            android:name=".BaseListActivity"
+            android:name="co.bantamstudio.attabase.BaseListActivity"
             android:label="@string/title_base_list" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="co.bantamstudio.attabase.ActivityMain" />
         </activity>
         <activity
-            android:name=".BaseDetailActivity"
+            android:name="co.bantamstudio.attabase.BaseDetailActivity"
             android:label="@string/title_base_detail" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".BaseListActivity" />
         </activity>
         <activity
-            android:name=".ActivityBaseViewer"
+            android:name="co.bantamstudio.attabase.ActivityBaseViewer"
             android:label="@string/title_activity_activity_base_viewer" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".ActivityHome"
+            android:name="co.bantamstudio.attabase.ActivityBaseList"
             android:label="@string/title_activity_activity_home" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".ActivityWizard"
+            android:name="co.bantamstudio.attabase.ActivityWizard"
             android:label="@string/title_activity_activity_wizard" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="co.bantamstudio.attabase.ActivityMain" />
+        </activity>
+        <activity
+            android:name="co.bantamstudio.attabase.ActivityActionBar"
+            android:label="@string/title_activity_activity_action_bar"
+            android:theme="@style/Theme.Sherlock" >
         </activity>
     </application>
 

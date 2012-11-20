@@ -4,4 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-</LinearLayout> 
+    <ViewAnimator
+        android:id="@+id/listAnimator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" >
+    </ViewAnimator>
+
+</LinearLayout>
