@@ -36,17 +36,19 @@ public class ActivityBaseList extends SherlockActivity {
 	private ViewAnimator va;
 	private VIEW_TYPE mCurrentView; 
 	
-	private static enum VIEW_TYPE {VIEW_SERVICES, VIEW_BASES, VIEW_BASE, VIEW_LOCATION};
-	private static enum SERVICE {AIR_FORCE, ARMY, NAVY, MARINES, DEFAULT};
-
+	public static enum VIEW_TYPE {VIEW_SERVICES, VIEW_BASES, VIEW_BASE, VIEW_LOCATION};
+	public static enum SERVICE {AIR_FORCE, ARMY, NAVY, MARINES, DEFAULT};
+	//private int mCurrentService;
+	//private int mCurrentBase;
+	private Service mCurrentService;
+	private Base mCurrentBase;
 	
 	// Animations
-	private Animation leftToMiddle = horizontalAnimation(-1.0f, AttaBaseContract.RIGHT);
-	private Animation middleToRight = horizontalAnimation(0.0f, AttaBaseContract.RIGHT);
-	private Animation rightToMiddle = horizontalAnimation(+1.0f, AttaBaseContract.LEFT);
-	private Animation middleToLeft = horizontalAnimation(0.0f, AttaBaseContract.LEFT);
-	private int mCurrentService;
-	private int mCurrentBase;
+	private Animation leftToMiddle = AttaBaseContract.horizontalAnimation(-1.0f, AttaBaseContract.RIGHT);
+	private Animation middleToRight = AttaBaseContract.horizontalAnimation(0.0f, AttaBaseContract.RIGHT);
+	private Animation rightToMiddle = AttaBaseContract.horizontalAnimation(+1.0f, AttaBaseContract.LEFT);
+	private Animation middleToLeft = AttaBaseContract.horizontalAnimation(0.0f, AttaBaseContract.LEFT);
+	private Location mCurrentLocation;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,9 +62,9 @@ public class ActivityBaseList extends SherlockActivity {
         mDbHelper = new LocationDbHelper(this.getApplicationContext());
         
         // Load set preferences
-        SharedPreferences prefs = getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
-        mCurrentBase = prefs.getInt(AttaBaseContract.PREFS_HOME_BASE_INT, AttaBaseContract.NO_BASE);
-        mCurrentService = prefs.getInt(AttaBaseContract.PREFS_HOME_SERVICE_INT, AttaBaseContract.NO_BASE);
+        //SharedPreferences prefs = getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
+        //mCurrentBase = prefs.getInt(AttaBaseContract.PREFS_HOME_BASE_INT, AttaBaseContract.NO_BASE);
+        //mCurrentService = prefs.getInt(AttaBaseContract.PREFS_HOME_SERVICE_INT, AttaBaseContract.NO_BASE);
     }
 
     @Override
@@ -70,15 +72,15 @@ public class ActivityBaseList extends SherlockActivity {
         super.onStart();  // Always call the superclass method first
         
         if (va.getChildCount() == 0){
-	        if (mCurrentBase > 0){
-	        	transitionToNewView(VIEW_TYPE.VIEW_BASE, mCurrentBase);
-	        }
-	        else if (mCurrentService > 0){
-	        	transitionToNewView(VIEW_TYPE.VIEW_BASES, mCurrentService);
-	        }
-	        else {
+	        //if (mCurrentBase > 0){
+	        //	transitionToNewView(VIEW_TYPE.VIEW_BASE, mCurrentBase);
+	        //}
+	        //else if (mCurrentService > 0){
+	        //	transitionToNewView(VIEW_TYPE.VIEW_BASES, mCurrentService);
+	        //}
+	        //else {
 	        	transitionToNewView(VIEW_TYPE.VIEW_SERVICES, AttaBaseContract.NO_BASE);
-	        }  
+	        //}  
         }
     }
     
@@ -148,7 +150,7 @@ public class ActivityBaseList extends SherlockActivity {
     	   super.onBackPressed();
     }
     
-    private LinearLayout populateBaseListView(int serviceIndex, int baseIndex) {
+    private LinearLayout populateBaseListView(Service service, Base base) {
         // LOAD LAYOUT XML    
         LinearLayout ll = (LinearLayout) View.inflate(this, R.layout.base_list_view, null);
         
@@ -156,10 +158,10 @@ public class ActivityBaseList extends SherlockActivity {
         LinearLayout headerLl = (LinearLayout) ll.findViewById(R.id.baseInformation);
         Header header;
 		try {
-			header = new Header(mCurrentView, serviceIndex, baseIndex, headerLl);
+			header = new Header(mCurrentView, headerLl, service, base);
 		} catch (Exception e) {
 			header = null;
-			e.printStackTrace();
+			Log.d("Exception", e.getMessage());
 		}
         if (header == null){
         	headerLl.setVisibility(LinearLayout.GONE);
@@ -183,35 +185,19 @@ public class ActivityBaseList extends SherlockActivity {
         return ll;
     }
     
-    private LinearLayout populateBaseLocationView(int loc) {
+    private LinearLayout populateBaseLocationView(Location loc) {
 
-    	String locationName, locationPhone, locationCity, locationCountry;
-    	
-    	// GET LOCATION INFORMATION
-        Cursor location = mDbHelper.getLocation(loc);
-        if (location.moveToFirst()){
-        	locationName = location.getString(location.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME));
-        	locationPhone = location.getString(location.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE1));
-        	locationCity = location.getString(location.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_CITY));
-        	locationCountry = location.getString(location.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_COUNTRY));
-        }
-        else
-        	locationName = locationPhone = locationCity = locationCountry = "";
-        location.close();
-
-        
-    	
         // LOAD LAYOUT XML    
         LinearLayout ll = (LinearLayout) View.inflate(this, R.layout.base_location_view, null);
         
         TextView locationNameText = (TextView) ll.findViewById(R.id.locationName);
-        locationNameText.setText(locationName);
+        locationNameText.setText(loc.getLocationName());
         TextView locationPhoneText = (TextView) ll.findViewById(R.id.locationPhone);
-        locationPhoneText.setText(locationPhone);
+        locationPhoneText.setText(loc.getLocationPhone1());
         TextView locationCityText = (TextView) ll.findViewById(R.id.locationCity);
-        locationCityText.setText(locationCity);
+        locationCityText.setText(loc.getLocationCity());
         TextView locationCountryText = (TextView) ll.findViewById(R.id.locationCountry);
-        locationCountryText.setText(locationCountry);
+        locationCountryText.setText(loc.getLocationCountry());
         
         return ll;
     }
@@ -222,28 +208,44 @@ public class ActivityBaseList extends SherlockActivity {
     	
     	switch (vt) {
     	case VIEW_SERVICES:
-    		mCurrentService = AttaBaseContract.NO_SERVICE;
+    		mCurrentService = null;
+    		mCurrentBase = null;
     		setCursorAdapterServicesAll();
-        	ll = populateBaseListView(AttaBaseContract.NO_SERVICE, AttaBaseContract.NO_BASE);
+        	ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
         	break;
     	case VIEW_BASES:
-    		mCurrentService = index;
-    		setCursorAdapterService(mCurrentService);
-        	ll = populateBaseListView(mCurrentService, AttaBaseContract.NO_BASE);
+    		try {
+				mCurrentService = new Service(this, mDbHelper, index);
+			} catch (Exception e1) {
+				Log.d("Exception", e1.getMessage());
+			};
+    		mCurrentBase = null;
+    		setCursorAdapterService(index);
+        	ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
         	break;
     	case VIEW_BASE:
+    		try {
+				mCurrentBase = new Base(mDbHelper,mCurrentService,index);
+			} catch (Exception e) {
+				Log.d("Exception", e.getMessage());
+			}
     		setCursorAdapterBaseLocationsAll(index);
-    		ll = populateBaseListView(mCurrentService, index);
+    		ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
         	break;
     	case VIEW_LOCATION:
     		//setCursorAdapterBaseLocation(loc);
-    		ll = populateBaseLocationView(index);
+    		try {
+				mCurrentLocation = new Location(mDbHelper,index,mCurrentService, mCurrentBase);
+			} catch (Exception e) {
+				Log.d("Exception", e.getMessage());
+			}
+    		ll = populateBaseLocationView(mCurrentLocation);
     		va.addView(ll);
         	va.showNext();
         	break;
@@ -325,148 +327,4 @@ public class ActivityBaseList extends SherlockActivity {
         int to[] = new int[] {R.id.name_entry};
         mAdapter = new SimpleCursorAdapter(this, R.layout.base_list_item, baseLocationTypes, columns, to);
     }
-	
-	private Animation horizontalAnimation(float startingX, int direction) {
-		Animation inFromLeft = new TranslateAnimation(
-				Animation.RELATIVE_TO_PARENT, startingX,
-				Animation.RELATIVE_TO_PARENT, startingX + (direction * 1.0f),
-				Animation.RELATIVE_TO_PARENT, 0.0f,
-				Animation.RELATIVE_TO_PARENT, 0.0f);
-		inFromLeft.setDuration(500);
-		inFromLeft.setInterpolator(new AccelerateInterpolator());
-		return inFromLeft;
-	}
-	
-	private class Header {
-		private TextView textView1;
-        private TextView textView2;
-        private ImageView iv;
-		private SERVICE service;
-		private int serviceSymbol;
-		private Cursor headerInfo;
-		private String text1 = "";
-		private String text2 = "";
-		private int textColor1 = Color.BLACK;
-		private int textColor2 = Color.BLACK;
-		private int backgroundColor = Color.WHITE;
-		private long text1Size = 24;
-		private long text2Size = 12;
-		
-		public Header(VIEW_TYPE viewType, int serviceIndex, int baseIndex, LinearLayout ll) throws Exception {
-			setService(serviceIndex);
-	        textView1 = (TextView) ll.findViewById(R.id.text1);
-	        textView2 = (TextView) ll.findViewById(R.id.text2);
-	    	backgroundColor = getColor1(service);
-	    	textColor1 = textColor2 = getColor2(service);
-	    	iv = (ImageView) ll.findViewById(R.id.serviceIcon);
-	    	
-	    	switch (viewType) {
-			case VIEW_BASE:
-				headerInfo = mDbHelper.getBase(baseIndex);
-		    	if (headerInfo.moveToFirst()){
-		        	text1 = headerInfo.getString(headerInfo.getColumnIndex(AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME));
-		        	text2 = headerInfo.getString(headerInfo.getColumnIndex(AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME));
-		        }
-		    	headerInfo.close();
-				break;
-			case VIEW_BASES:
-				headerInfo = mDbHelper.getService(serviceIndex);
-		    	if (headerInfo.moveToFirst()){
-		        	text1 = headerInfo.getString(headerInfo.getColumnIndex(AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME));
-		        }
-		    	headerInfo.close();
-
-		    	textView2.setVisibility(TextView.GONE);
-		    	text1Size = 30;
-		    	textView1.setGravity(Gravity.CENTER_VERTICAL);
-		    	break;
-			case VIEW_SERVICES:
-			case VIEW_LOCATION:
-			default:
-				throw new Exception("no header for current view type");
-			}
-	    	
-	        if (this.text1.equals("") && this.text2.equals(""))
-	        	throw new Exception("no header for current view type");
-	        else{
-	        	textView1.setText(this.text1);
-	        	textView1.setTextColor(textColor1);
-	        	textView1.setTextSize(text1Size);
-	        	
-	        	if (textView2.getVisibility() != TextView.GONE){
-	        		textView2.setText(this.text2);
-	        		textView2.setTextColor(textColor2);	    
-	        		textView2.setTextSize(text2Size);
-	        	}			    
-			    ll.setBackgroundColor(backgroundColor);
-	        }  
-	        
-	        iv.setVisibility(ImageView.VISIBLE);
-	        iv.setImageResource(serviceSymbol);
-	        iv.setBackgroundColor(backgroundColor);
-		}
-		
-		private int getColor1(SERVICE service) {
-			switch (service) {
-			case AIR_FORCE:
-				return getResources().getColor(R.color.af_blue);
-			case ARMY:
-				return getResources().getColor(R.color.army_green);
-			case MARINES:
-				return getResources().getColor(R.color.marines_scarlet);
-			case NAVY:
-				return getResources().getColor(R.color.navy_blue);
-			default:
-				return Color.WHITE;
-			}
-		}
-		
-		private int getColor2(SERVICE service) {
-			switch (service) {
-			case AIR_FORCE:
-				return getResources().getColor(R.color.af_grey);
-			case ARMY:
-				return getResources().getColor(R.color.army_yellow);
-			case MARINES:
-				//return getResources().getColor(R.color.marines_scarlet);
-				//return Color.WHITE;
-			case NAVY:
-				return getResources().getColor(R.color.navy_gold);
-			default:
-				return Color.BLACK;
-			}
-		}
-		
-	    private void setService(int index) {
-	    	
-	    	Cursor service = mDbHelper.getService(index);
-	    	int serviceNumber = 0;
-	        if (service.moveToFirst()){
-	        	serviceNumber = service.getInt(service.getColumnIndex(AttaBaseContract.ServiceSchema._ID));
-	        }
-	        service.close();
-	        
-	        switch (serviceNumber) {
-			case 1:
-				this.service = SERVICE.ARMY;
-				serviceSymbol = R.drawable.army_symbol;
-				break;
-			case 2:
-				this.service = SERVICE.MARINES;
-				serviceSymbol = R.drawable.marines_symbol;
-				break;
-			case 3:
-				this.service = SERVICE.NAVY;
-				serviceSymbol = R.drawable.navy_symbol;
-				break;
-			case 4:
-				this.service = SERVICE.AIR_FORCE;
-				serviceSymbol = R.drawable.af_symbol;
-				break;
-			default:
-
-				break;
-			}
-		}
-	}
 }

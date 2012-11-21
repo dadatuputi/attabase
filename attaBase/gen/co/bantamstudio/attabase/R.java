@@ -718,10 +718,10 @@ containing a value of this type.
         public static final int abs__bright_foreground_inverse_holo_dark=0x7f060006;
         public static final int abs__bright_foreground_inverse_holo_light=0x7f060007;
         public static final int abs__holo_blue_light=0x7f060008;
-        public static final int abs__primary_text_disable_only_holo_dark=0x7f060013;
-        public static final int abs__primary_text_disable_only_holo_light=0x7f060014;
-        public static final int abs__primary_text_holo_dark=0x7f060015;
-        public static final int abs__primary_text_holo_light=0x7f060016;
+        public static final int abs__primary_text_disable_only_holo_dark=0x7f060016;
+        public static final int abs__primary_text_disable_only_holo_light=0x7f060017;
+        public static final int abs__primary_text_holo_dark=0x7f060018;
+        public static final int abs__primary_text_holo_light=0x7f060019;
         public static final int af_blue=0x7f06000a;
         public static final int af_grey=0x7f06000f;
         public static final int army_green=0x7f06000e;
@@ -731,7 +731,10 @@ containing a value of this type.
         public static final int navy_blue=0x7f060010;
         public static final int navy_gold=0x7f060011;
         public static final int navy_red=0x7f060012;
+        public static final int old_glory_blue=0x7f060014;
+        public static final int old_glory_red=0x7f060013;
         public static final int red=0x7f060009;
+        public static final int white=0x7f060015;
     }
     public static final class dimen {
         /**  Default height of an action bar. 
@@ -977,9 +980,9 @@ containing a value of this type.
         public static final int navy_symbol=0x7f02007d;
     }
     public static final class id {
-        public static final int ImageView01=0x7f040044;
-        public static final int TextView01=0x7f040045;
-        public static final int TextView02=0x7f040043;
+        public static final int ImageView01=0x7f040046;
+        public static final int TextView01=0x7f04004f;
+        public static final int TextView02=0x7f040045;
         public static final int abs__action_bar=0x7f040022;
         public static final int abs__action_bar_container=0x7f040021;
         public static final int abs__action_bar_subtitle=0x7f040011;
@@ -1020,56 +1023,57 @@ containing a value of this type.
         public static final int abs__title=0x7f04001b;
         public static final int abs__titleDivider=0x7f04001c;
         public static final int abs__up=0x7f04000b;
-        public static final int address1=0x7f040039;
-        public static final int address2=0x7f04003a;
-        public static final int address3=0x7f04003b;
-        public static final int baseInformation=0x7f040052;
-        public static final int baseInformation1=0x7f040054;
-        public static final int baseList=0x7f040051;
-        public static final int baseListView1=0x7f040057;
-        public static final int button1=0x7f040046;
-        public static final int city=0x7f04003c;
-        public static final int country=0x7f04003f;
+        public static final int address1=0x7f04003b;
+        public static final int address2=0x7f04003c;
+        public static final int address3=0x7f04003d;
+        public static final int addressBlockSmall=0x7f040036;
+        public static final int baseImage=0x7f040037;
+        public static final int baseInformation=0x7f040053;
+        public static final int baseInformation1=0x7f040055;
+        public static final int baseList=0x7f040052;
+        public static final int baseListView1=0x7f040058;
+        public static final int baseName=0x7f040038;
+        public static final int button1=0x7f040048;
+        public static final int city=0x7f04003e;
+        public static final int country=0x7f040041;
         public static final int disableHome=0x7f040009;
-        public static final int editText1=0x7f040047;
         public static final int edit_query=0x7f040027;
-        public static final int frameLayout1=0x7f040049;
         public static final int homeAsUp=0x7f040006;
         public static final int imageView1=0x7f040034;
-        public static final int imageView2=0x7f040041;
-        public static final int imageView3=0x7f040038;
-        public static final int imageView4=0x7f040048;
+        public static final int imageView2=0x7f040043;
+        public static final int imageView3=0x7f04003a;
         public static final int importContinueButton=0x7f04004d;
-        public static final int importMessage=0x7f04004a;
-        public static final int importProgressBar=0x7f04004b;
+        public static final int importMessage=0x7f04004c;
+        public static final int importProgressBar=0x7f040049;
         public static final int initial_import_prompt=0x7f04004e;
         public static final int listAnimator=0x7f040035;
         public static final int listMode=0x7f040002;
-        public static final int locationCity=0x7f04005a;
-        public static final int locationCountry=0x7f04005b;
-        public static final int locationName=0x7f040058;
-        public static final int locationPhone=0x7f040059;
-        public static final int menu_settings=0x7f04005c;
-        public static final int name_entry=0x7f04004f;
-        public static final int name_entry_sub=0x7f040050;
+        public static final int locationCity=0x7f04005b;
+        public static final int locationCountry=0x7f04005c;
+        public static final int locationName=0x7f040059;
+        public static final int locationPhone=0x7f04005a;
+        public static final int menu_settings=0x7f04005d;
+        public static final int name_entry=0x7f040050;
+        public static final int name_entry_sub=0x7f040051;
         public static final int normal=0x7f040001;
-        public static final int phone=0x7f040042;
-        public static final int serviceIcon=0x7f040053;
+        public static final int phone=0x7f040044;
+        public static final int serviceIcon=0x7f040054;
         public static final int showCustom=0x7f040008;
         public static final int showHome=0x7f040005;
         public static final int showTitle=0x7f040007;
-        public static final int state=0x7f04003d;
+        public static final int state=0x7f04003f;
         public static final int tabMode=0x7f040003;
-        public static final int text1=0x7f040055;
-        public static final int text2=0x7f040056;
+        public static final int text1=0x7f040056;
+        public static final int text2=0x7f040057;
         public static final int textView1=0x7f040033;
-        public static final int textView2=0x7f040036;
-        public static final int textView3=0x7f040037;
-        public static final int textView4=0x7f04004c;
-        public static final int textView5=0x7f040040;
+        public static final int textView2=0x7f04004a;
+        public static final int textView3=0x7f040039;
+        public static final int textView4=0x7f04004b;
+        public static final int textView5=0x7f040042;
         public static final int useLogo=0x7f040004;
+        public static final int website=0x7f040047;
         public static final int wrap_content=0x7f040000;
-        public static final int zip=0x7f04003e;
+        public static final int zip=0x7f040040;
     }
     public static final class integer {
         public static final int abs__max_action_buttons=0x7f080000;
@@ -1103,13 +1107,16 @@ containing a value of this type.
         public static final int activity_home=0x7f030019;
         public static final int activity_import_csv_importing=0x7f03001a;
         public static final int activity_import_csv_start=0x7f03001b;
-        public static final int activity_wizard=0x7f03001c;
-        public static final int base_list_item=0x7f03001d;
-        public static final int base_list_view=0x7f03001e;
-        public static final int base_location_view=0x7f03001f;
-        public static final int preferences=0x7f030020;
-        public static final int sherlock_spinner_dropdown_item=0x7f030021;
-        public static final int sherlock_spinner_item=0x7f030022;
+        public static final int activity_wizard_1=0x7f03001c;
+        public static final int activity_wizard_2=0x7f03001d;
+        public static final int activity_wizard_3=0x7f03001e;
+        public static final int activity_wizard_list=0x7f03001f;
+        public static final int base_list_item=0x7f030020;
+        public static final int base_list_view=0x7f030021;
+        public static final int base_location_view=0x7f030022;
+        public static final int preferences=0x7f030023;
+        public static final int sherlock_spinner_dropdown_item=0x7f030024;
+        public static final int sherlock_spinner_item=0x7f030025;
     }
     public static final class menu {
         public static final int activity_action_bar=0x7f0b0000;
@@ -1168,6 +1175,7 @@ containing a value of this type.
         public static final int abs__shareactionprovider_share_with_application=0x7f090009;
         public static final int address=0x7f090027;
         public static final int app_name=0x7f09000f;
+        public static final int attabase_import=0x7f09002c;
         public static final int bases=0x7f090018;
         public static final int browse_all_locations=0x7f09002a;
         public static final int button_continue=0x7f09001e;
@@ -1182,6 +1190,8 @@ containing a value of this type.
         public static final int locations=0x7f090019;
         public static final int menu_settings=0x7f090011;
         public static final int phone=0x7f090028;
+        public static final int select_base=0x7f090032;
+        public static final int select_service=0x7f09002e;
         public static final int start_screen_uninitialized=0x7f09001c;
         public static final int title_activity_activity_action_bar=0x7f090025;
         public static final int title_activity_activity_base_viewer=0x7f090022;
@@ -1193,12 +1203,25 @@ containing a value of this type.
         public static final int title_base_detail=0x7f090020;
         public static final int title_base_list=0x7f090021;
         public static final int website=0x7f090029;
+        public static final int welcome=0x7f09002b;
+        public static final int wizard=0x7f09002d;
+        public static final int wizard_1=0x7f090030;
+        public static final int wizard_2=0x7f090031;
+        public static final int wizard_3=0x7f090034;
+        public static final int wizard_finished=0x7f090035;
+        public static final int wizard_text_1=0x7f09002f;
+        public static final int wizard_text_2=0x7f090033;
+        public static final int wizard_text_3=0x7f090036;
         public static final int zero=0x7f09001a;
     }
     public static final class style {
         public static final int AppTheme=0x7f0a0059;
+        public static final int BottomRelativeLayout=0x7f0a005d;
         public static final int DialogWindowTitle_Sherlock=0x7f0a0036;
         public static final int DialogWindowTitle_Sherlock_Light=0x7f0a0037;
+        public static final int HeaderLarge=0x7f0a005a;
+        public static final int HeaderMedium=0x7f0a005b;
+        public static final int LocationGroup=0x7f0a005c;
         public static final int Sherlock___TextAppearance_Small=0x7f0a004a;
         public static final int Sherlock___Theme=0x7f0a004e;
         public static final int Sherlock___Theme_DarkActionBar=0x7f0a0050;
