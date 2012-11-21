@@ -159,6 +159,29 @@ public class LocationDbHelper extends SQLiteOpenHelper {
 		return dbReadable.rawQuery(q, null);	
 	}
 	
+	public Cursor getBaseAddress(int baseNumber) {
+		String q = 
+				"SELECT " +
+					"c." + AttaBaseContract.LocationSchema._ID + 
+					", d." + AttaBaseContract.LocationTypeSchema.COLUMN_NAME_DIRECTORY_NAME +
+				" FROM " + 
+					AttaBaseContract.BaseSchema.TABLE_NAME + " a" + 
+					" INNER JOIN " + AttaBaseContract.ServiceSchema.TABLE_NAME + " b ON " + 
+						"a." + AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_SERVICE + " = " + 
+						"b." + AttaBaseContract.ServiceSchema._ID + 
+					" INNER JOIN " + AttaBaseContract.LocationSchema.TABLE_NAME + " c ON " +
+						"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_BASE + " = " +
+						"a." + AttaBaseContract.BaseSchema._ID +
+					" INNER JOIN " + AttaBaseContract.LocationTypeSchema.TABLE_NAME + " d ON " +
+						"d." + AttaBaseContract.LocationTypeSchema._ID + " = " +
+						"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_TYPE +
+				" WHERE " +
+					"a." + AttaBaseContract.BaseSchema._ID + " = " + baseNumber + " AND " +
+					"d." + AttaBaseContract.LocationTypeSchema.COLUMN_NAME_DIRECTORY_NAME + " = '" + AttaBaseContract.LocationTypeSchema.BASE_ADDRESS_TYPE + "'";
+					
+		return dbReadable.rawQuery(q, null);	
+	}
+	
 	public Cursor getService(int service) {
 		String q = 
 				"SELECT *" +

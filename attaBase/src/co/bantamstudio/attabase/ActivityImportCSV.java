@@ -75,7 +75,7 @@ public class ActivityImportCSV extends Activity {
         mDbHelper.onUpgrade(db, 1, 1);
         
         importProgress = (ProgressBar)findViewById(R.id.importProgressBar);
-        //importProgress.setMax(AttaBaseContract.TOTAL_ROWS);
+        //imSportProgress.setMax(AttaBaseContract.TOTAL_ROWS);
         basesImported = (TextView)findViewById(R.id.textView3);
         locationsImported = (TextView)findViewById(R.id.textView5);
         
@@ -91,9 +91,7 @@ public class ActivityImportCSV extends Activity {
     	// Once import is complete, show continue button
     	Button continueButton = (Button)findViewById(R.id.importContinueButton);
     	continueButton.setVisibility(Button.VISIBLE);
-    	
-    	importProgress.setVisibility(ProgressBar.INVISIBLE);
-    	
+    	// CHANGE TEXT
     	TextView importMessage = (TextView)findViewById(R.id.importMessage);
     	importMessage.setText(getString(R.string.import_completed_message));
     	importMessage.setTextSize(15);
@@ -107,11 +105,14 @@ public class ActivityImportCSV extends Activity {
     	editor.putBoolean(AttaBaseContract.PREFS_IMPORTED_BOOL, true);
     	editor.commit();
     	
+    	importProgress.setIndeterminate(false);
+    	importProgress.setProgress(importProgress.getMax());
+    	
     	showCompletedViews();
     }
     
-    private void setProgress(Integer progress, int count, int totalBases){
-    	importProgress.setProgress(progress);
+    private void setProgress(int count, int totalBases){
+    	//importProgress.setProgress(progress);
     	basesImported.setText(Integer.toString(totalBases));
     	locationsImported.setText(Integer.toString(count));
     }
@@ -226,8 +227,8 @@ public class ActivityImportCSV extends Activity {
 					    insertLocationStmt.bindLong(21, installation.get(base));
 					    newRowId = insertLocationStmt.executeInsert();
 					    
-						int percent = (int) ((++count/(float)AttaBaseContract.TOTAL_ROWS) * 100);
-						publishProgress(percent);
+						count++;
+						publishProgress();
 						
 						// COMMENT THE FOLLOWING LINE FOR PRODUCTION
 						//if (count > 50) break;
@@ -249,13 +250,13 @@ public class ActivityImportCSV extends Activity {
 		@Override
 		protected void onProgressUpdate(Integer... progress) {
 			super.onProgressUpdate(progress);
-			setProgress(progress[0], count, totalBases);
+			setProgress(count, totalBases);
 		}
 		
 		@Override
 		protected void onPostExecute(Integer result){
 			super.onPostExecute(result);
-			setProgress(100, count, totalBases);
+			setProgress(count, totalBases);
 			onComplete();			
 		}
 	}

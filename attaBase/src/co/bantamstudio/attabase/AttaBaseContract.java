@@ -1,6 +1,9 @@
 package co.bantamstudio.attabase;
 
 import android.provider.BaseColumns;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 
 public class AttaBaseContract {
 	
@@ -12,6 +15,9 @@ public class AttaBaseContract {
 	
 	public static final String IMPORT_SOURCE_CSV = "attaBase.csv"; 
 	public static final String APP_STRING = "co.bantamstudio.attabase";
+	public static final String BASE_LIST_STATE = APP_STRING+"_base_list_state";
+	// STATES TO PASS TO BASE LIST
+	public static final String BASE_LIST_BASE = "base_list_base";
 	
 	// PREFERENCES
 	public static final String PREFS_IMPORTED_BOOL = "importedBool";
@@ -27,7 +33,7 @@ public class AttaBaseContract {
 	public class BaseSchema implements BaseColumns{
 		public static final String TABLE_NAME = "base";
 		public static final String COLUMN_NAME_BASE_NAME = "basename";
-		public static final String COLUMN_NAME_BASE_SERVICE = "baseservice";	
+		public static final String COLUMN_NAME_BASE_SERVICE = "baseservice";
 		public static final String STRING_CREATE_TABLE = 
 				"CREATE TABLE " + TABLE_NAME + " (" +
 						_ID + " INTEGER PRIMARY KEY," +
@@ -60,6 +66,7 @@ public class AttaBaseContract {
 	public class LocationTypeSchema implements BaseColumns{
 		public static final String TABLE_NAME = "directory";
 		public static final String COLUMN_NAME_DIRECTORY_NAME = "directoryname";
+		public static final String BASE_ADDRESS_TYPE = "Location";
 		public static final String STRING_CREATE_TABLE = 
 				"CREATE TABLE " + TABLE_NAME + " (" +
 						_ID + " INTEGER PRIMARY KEY," +
@@ -151,5 +158,16 @@ public class AttaBaseContract {
 						COLUMN_NAME_WEBSITE3 + ", " + 
 						COLUMN_NAME_LOCATION_TYPE + ", " + 
 						COLUMN_NAME_BASE + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	}
+	
+	public static Animation horizontalAnimation(float startingX, int direction) {
+		Animation inFromLeft = new TranslateAnimation(
+				Animation.RELATIVE_TO_PARENT, startingX,
+				Animation.RELATIVE_TO_PARENT, startingX + (direction * 1.0f),
+				Animation.RELATIVE_TO_PARENT, 0.0f,
+				Animation.RELATIVE_TO_PARENT, 0.0f);
+		inFromLeft.setDuration(250);
+		inFromLeft.setInterpolator(new AccelerateInterpolator());
+		return inFromLeft;
 	}
 }

@@ -9,12 +9,12 @@
     <string name="button_send">Send</string>
     <string name="title_activity_display_message">My Message</string>
     <string name="title_activity_show_all_entries">ShowAllEntries</string>
-    <string name="importing">We are performing the initial import of the base data. This may take several minutes, depending on your phone. This only needs to be performed once.</string>
+    <string name="importing">We are performing the initial import of the base data. This may take several minutes, depending on your phone (there are approximately 15k locations to import). This only needs to be performed once.</string>
     <string name="bases">Bases Imported:</string>
     <string name="locations">Locations Imported: </string>
     <string name="zero">0</string>
     <string name="initial_import_completed">Initial Import Completed</string>
-    <string name="start_screen_uninitialized">Welcome! This is the first time you\'ve run attaBase.\n\nWe need to perform an initial import. Tap &quot;Import&quot; below to continue.</string>
+    <string name="start_screen_uninitialized">We need to perform an initial import. Tap &quot;Continue&quot; below to import the DoD data.</string>
     <string name="button_import">Import</string>
     <string name="button_continue">Continue</string>
     <string name="import_completed_message">Initial import completed. Please continue.</string>
@@ -29,5 +29,17 @@
     <string name="phone">Phone</string>
     <string name="website">Website</string>
     <string name="browse_all_locations">Browse All Locations</string>
+    <string name="welcome">Welcome to attaBase!</string>
+    <string name="attabase_import">attaBase Import</string>
+    <string name="wizard">attaBase Wizard</string>
+    <string name="select_service">Select a default service</string>
+    <string name="wizard_text_1">Selecting a default service will allow attaBase to tailor your experience. Don\'t worry, you can still browse all services with a default service selected.</string>
+    <string name="wizard_1">attaBase Wizard: Step 1</string>
+    <string name="wizard_2">attaBase Wizard: Step 2</string>
+    <string name="select_base">Select a default base</string>
+    <string name="wizard_text_2">Select a base to show when you start attaBase. You may still browse all other bases after setting your default base.</string>
+    <string name="wizard_3">attaBase Wizard: Completed</string>
+    <string name="wizard_finished">You\'re finished!</string>
+    <string name="wizard_text_3">You may now enjoy using attaBase. You may change your home base or service by browsing and selecting the \"Set default\" option in the toolbar.</string>
 
 </resources>
