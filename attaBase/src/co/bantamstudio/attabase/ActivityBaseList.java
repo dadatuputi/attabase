@@ -13,15 +13,20 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.FilterQueryProvider;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewAnimator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
@@ -30,8 +35,8 @@ import android.view.animation.TranslateAnimation;
 public class ActivityBaseList extends SherlockActivity {
 	ActionBarSherlock mSherlock = ActionBarSherlock.wrap(this);
 	//private Set<Cursor> cursors;
-	private SimpleCursorAdapter mAdapter;
-	private LocationDbHelper mDbHelper;
+	//private SimpleCursorAdapter mAdapter;
+	//private LocationDbHelper mDbHelper;
 	// http://www.qubi.us/2011/09/easy-viewanimator-transition-slide.html
 	private ViewAnimator va;
 	private VIEW_TYPE mCurrentView; 
@@ -59,7 +64,7 @@ public class ActivityBaseList extends SherlockActivity {
         va.setOutAnimation(middleToLeft);
         
         //loadServices(findViewById(R.id.button1));
-        mDbHelper = new LocationDbHelper(this.getApplicationContext());
+        //mDbHelper = new LocationDbHelper(this.getApplicationContext());
         
         // Load set preferences
         //SharedPreferences prefs = getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
@@ -124,15 +129,7 @@ public class ActivityBaseList extends SherlockActivity {
 //        return true;
     }
     
-    @Override
-    protected void onDestroy(){
-    	if (mDbHelper!=null){
-    		mDbHelper.close();
-    	}
-    	
-    	super.onDestroy();
-    }
-    
+  
     @Override
     public void onBackPressed() {
        Log.d("CDA", "onBackPressed Called");
@@ -150,7 +147,32 @@ public class ActivityBaseList extends SherlockActivity {
     	   super.onBackPressed();
     }
     
-    private LinearLayout populateBaseListView(Service service, Base base) {
+    @SuppressWarnings("deprecation")
+	private LinearLayout populateBaseListView(Service service, Base base) {
+    	Cursor cursor;
+    	SimpleCursorAdapter adapter;
+    	String[] columns;
+    	int to[];
+    	
+    	switch (mCurrentView) {
+        case VIEW_BASES:
+        	cursor = managedQuery(AttaBaseProvider.CONTENT_URI_BASE, null, null, null, null);
+            columns = new String[] {AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME};
+            to = new int[] {R.id.name_entry};
+            adapter = new SimpleCursorAdapter(this, R.layout.base_list_item, cursor, columns, to);
+        	break;
+        case VIEW_SERVICES:
+    		cursor = managedQuery(AttaBaseProvider.CONTENT_URI_SERVICE, null, null, null, null);
+            columns = new String[] {AttaBaseContract.ServiceSchema._ID, AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME};
+            to = new int[] {0, R.id.name_entry};
+            adapter = new SimpleCursorAdapter(this, R.layout.base_list_item, cursor, columns, to);
+        	break;
+		default:
+			cursor = null;
+			adapter = null;
+			break;
+		}
+    	
         // LOAD LAYOUT XML    
         LinearLayout ll = (LinearLayout) View.inflate(this, R.layout.base_list_view, null);
         
@@ -170,18 +192,70 @@ public class ActivityBaseList extends SherlockActivity {
         	headerLl.setVisibility(LinearLayout.VISIBLE);
         }
         
+     // INITIALIZE THE LIST
+        if (adapter != null){
+	        ListView locations = (ListView) ll.findViewById(R.id.baseListView1);
+			locations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+						long arg3) {
+					//Toast.makeText(getApplicationContext(),
+					//		((TextView)((arg1).findViewById(R.id.name_entry))).getText(), Toast.LENGTH_SHORT).show();
+					transitionToNewView(getNextViewType(mCurrentView), arg3);
+				}
+			});
+	        // POPULATE THE LIST WITH LOCATIONS
+	        locations.setAdapter(adapter);
+        }
         
-        // INITIALIZE THE LIST
-        ListView locations = (ListView) ll.findViewById(R.id.baseListView1);
-		locations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				transitionToNewView(getNextViewType(mCurrentView), (int)arg3);
-			}
-		});
-        // POPULATE THE LIST WITH LOCATIONS
-        locations.setAdapter(mAdapter);
-
+        // SET UP FILTER
+//        mAdapter.setFilterQueryProvider(new FilterQueryProvider(){
+//
+//			@SuppressWarnings("deprecation")
+//			public Cursor runQuery(CharSequence constraint) {
+//				Cursor c;
+//				switch (mCurrentView) {
+//				case VIEW_BASE:
+//					c = mDbHelper.getBaseLocations(mCurrentBase.getBaseIndes(), constraint);
+//					break;
+//				case VIEW_BASES:
+//					c = mDbHelper.getAllBases(mCurrentService.getServiceIndex());
+//					break;
+//				case VIEW_SERVICES:
+//					c = mDbHelper.getAllServices();
+//					break;
+//				default:
+//					return null;
+//				}
+//				startManagingCursor(c);
+//				return c;
+//			}
+//        	
+//        });
+        //locations.setTextFilterEnabled(true);
+        
+//        EditText et = (EditText) ll.findViewById(R.id.filterText);
+//        
+//        et.addTextChangedListener(new TextWatcher(){
+//
+//			public void afterTextChanged(Editable s) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//
+//			public void beforeTextChanged(CharSequence s, int start, int count,
+//					int after) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//
+//			public void onTextChanged(CharSequence s, int start, int before,
+//					int count) {
+//	        		//mAdapter.getFilter().filter(s.toString());
+//	        		//mAdapter.runQueryOnBackgroundThread(s.toString());
+//			}
+//
+//        });
+        
         return ll;
     }
     
@@ -202,7 +276,7 @@ public class ActivityBaseList extends SherlockActivity {
         return ll;
     }
     
-	private void transitionToNewView(VIEW_TYPE vt, int index){
+	private void transitionToNewView(VIEW_TYPE vt, long index){
     	LinearLayout ll;
     	mCurrentView = vt;
     	
@@ -210,30 +284,30 @@ public class ActivityBaseList extends SherlockActivity {
     	case VIEW_SERVICES:
     		mCurrentService = null;
     		mCurrentBase = null;
-    		setCursorAdapterServicesAll();
+    		//setCursorAdapterServicesAll();
         	ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
         	break;
     	case VIEW_BASES:
     		try {
-				mCurrentService = new Service(this, mDbHelper, index);
+				mCurrentService = new Service(this, index);
 			} catch (Exception e1) {
 				Log.d("Exception", e1.getMessage());
 			};
     		mCurrentBase = null;
-    		setCursorAdapterService(index);
+    		//setCursorAdapterService(index);
         	ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
         	break;
     	case VIEW_BASE:
     		try {
-				mCurrentBase = new Base(mDbHelper,mCurrentService,index);
+				mCurrentBase = new Base(this, mCurrentService,index);
 			} catch (Exception e) {
 				Log.d("Exception", e.getMessage());
 			}
-    		setCursorAdapterBaseLocationsAll(index);
+    		//setCursorAdapterBaseLocationsAll(index);
     		ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
@@ -241,7 +315,7 @@ public class ActivityBaseList extends SherlockActivity {
     	case VIEW_LOCATION:
     		//setCursorAdapterBaseLocation(loc);
     		try {
-				mCurrentLocation = new Location(mDbHelper,index,mCurrentService, mCurrentBase);
+				mCurrentLocation = new Location(this, index,mCurrentService, mCurrentBase);
 			} catch (Exception e) {
 				Log.d("Exception", e.getMessage());
 			}
@@ -282,49 +356,5 @@ public class ActivityBaseList extends SherlockActivity {
     	default:
     		return VIEW_TYPE.VIEW_BASE;
     	}
-    }
-    
-    @SuppressWarnings("deprecation")
-    private void setCursorAdapterBaseLocationsAll(int base){
-    	Cursor baseLocations = mDbHelper.getBaseLocations(base);
-    	startManagingCursor(baseLocations);
-        String[] columns = new String[] {AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME, AttaBaseContract.LocationTypeSchema.COLUMN_NAME_DIRECTORY_NAME};
-        int to[] = new int[] {R.id.name_entry, R.id.name_entry_sub};
-        mAdapter = new SimpleCursorAdapter(this, R.layout.base_list_item, baseLocations, columns, to);
-    }
-    
-    @SuppressWarnings("deprecation")
-    private void setCursorAdapterServicesAll(){
-    	Cursor services = mDbHelper.getAllServices();
-    	startManagingCursor(services);
-        String[] columns = new String[] {AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME};
-        int to[] = new int[] {R.id.name_entry};
-        mAdapter = new SimpleCursorAdapter(this, R.layout.base_list_item, services, columns, to);
-    }
-    
-    @SuppressWarnings("deprecation")
-    private void setCursorAdapterService(int service){
-    	Cursor bases = mDbHelper.getAllBases(service);
-    	startManagingCursor(bases);
-        String[] columns = new String[] {AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME};
-        int to[] = new int[] {R.id.name_entry};
-        mAdapter = new SimpleCursorAdapter(this, R.layout.base_list_item, bases, columns, to);
-    }
-//    @SuppressWarnings("deprecation")
-//    private void setCursorAdapterBaseLocation(int loc){
-//    	Cursor location = mDbHelper.getBaseLocation(loc);
-//    	startManagingCursor(location);
-//        String[] columns = new String[] {AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME, AttaBaseContract.LocationTypeSchema.COLUMN_NAME_DIRECTORY_NAME};
-//        int to[] = new int[] {R.id.name_entry, R.id.name_entry_sub};
-//        mAdapter = new SimpleCursorAdapter(this, R.layout.activity_base_list_entry, location, columns, to);
-//    }
-    
-    @SuppressWarnings("deprecation")
-    private void setCursorAdapterBaseLocationTypes(int base){
-    	Cursor baseLocationTypes = mDbHelper.getBaseLocationTypes(base);
-    	startManagingCursor(baseLocationTypes);
-        String[] columns = new String[] {AttaBaseContract.LocationTypeSchema.COLUMN_NAME_DIRECTORY_NAME};
-        int to[] = new int[] {R.id.name_entry};
-        mAdapter = new SimpleCursorAdapter(this, R.layout.base_list_item, baseLocationTypes, columns, to);
     }
 }

@@ -41,5 +41,6 @@
     <string name="wizard_3">attaBase Wizard: Completed</string>
     <string name="wizard_finished">You\'re finished!</string>
     <string name="wizard_text_3">You may now enjoy using attaBase. You may change your home base or service by browsing and selecting the \"Set default\" option in the toolbar.</string>
+    <string name="filter_hint">Type here to filter...</string>
 
 </resources>

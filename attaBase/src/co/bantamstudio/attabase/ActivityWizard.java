@@ -3,15 +3,14 @@ package co.bantamstudio.attabase;
 import co.bantamstudio.attabase.ActivityBaseList.VIEW_TYPE;
 import com.actionbarsherlock.ActionBarSherlock;
 import com.actionbarsherlock.app.SherlockActivity;
+
 import android.os.Bundle;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -22,16 +21,16 @@ import android.widget.ViewAnimator;
 public class ActivityWizard extends SherlockActivity {
 	ActionBarSherlock mSherlock = ActionBarSherlock.wrap(this);
 	//private Set<Cursor> cursors;
-	private SimpleCursorAdapter mAdapter;
-	private LocationDbHelper mDbHelper;
+	//private SimpleCursorAdapter mAdapter;
+	//private LocationDbHelper mDbHelper;
 	// http://www.qubi.us/2011/09/easy-viewanimator-transition-slide.html
 	private ViewAnimator va;
 	private SharedPreferences prefs;
 	
 	private static enum STEP {STEP_1, STEP_1_CHOOSE, STEP_2, STEP_2_CHOOSE, STEP_3};
 	private STEP mCurrentStep = STEP.STEP_1;
-	private int mCurrentService;
-	private int mCurrentBase;
+	private long mCurrentService;
+	private long mCurrentBase;
 	
 	// Animations
 	private Animation leftToMiddle = AttaBaseContract.horizontalAnimation(-1.0f, AttaBaseContract.RIGHT);
@@ -48,7 +47,7 @@ public class ActivityWizard extends SherlockActivity {
         va.setInAnimation(rightToMiddle);
         va.setOutAnimation(middleToLeft);
         
-        mDbHelper = new LocationDbHelper(this.getApplicationContext());
+        //mDbHelper = new LocationDbHelper(this.getApplicationContext());
         
         // Load set preferences
         prefs = getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
@@ -137,7 +136,7 @@ public class ActivityWizard extends SherlockActivity {
 	}
     
     // ADD NEXT VIEW TO VIEWANIMATOR AND TRANSITION TO NEW VIEW
-	private void transitionToNewView(STEP step, int index) {
+	private void transitionToNewView(STEP step, long index) {
     	mCurrentStep = step;
     	
     	switch (step) {
@@ -156,12 +155,10 @@ public class ActivityWizard extends SherlockActivity {
         	va.showNext();
         	break;
     	case STEP_1_CHOOSE:
-    		setCursorAdapterServicesAll();
     		va.addView(populateBaseWizardView(VIEW_TYPE.VIEW_SERVICES, index));
         	va.showNext();
         	break;
     	case STEP_2_CHOOSE:
-    		setCursorAdapterService(mCurrentService);
     		va.addView(populateBaseWizardView(VIEW_TYPE.VIEW_BASES, mCurrentService));
         	va.showNext();
     		break;
@@ -170,22 +167,38 @@ public class ActivityWizard extends SherlockActivity {
     	}    	
 	}
 	
-    private LinearLayout populateBaseWizardView(VIEW_TYPE viewBases, int index) {
-        // LOAD LAYOUT XML    
+    @SuppressWarnings("deprecation")
+	private LinearLayout populateBaseWizardView(VIEW_TYPE viewBases, long index) {
+    	Cursor cursor;
+    	Service service = null;
+    	final SimpleCursorAdapter adapter;
+    	String[] columns;
+    	int to[];
+    	
+    	// LOAD LAYOUT XML    
         LinearLayout ll = (LinearLayout) View.inflate(this, R.layout.base_list_view, null);
         
-        Service service = null;
         switch (viewBases) {
         case VIEW_BASES:
         	try {
-				service = new Service(getBaseContext(), mDbHelper, index);
+				service = new Service(getBaseContext(), index);
 			} catch (Exception e1) {
 				Log.d("Exception", e1.getMessage());
 			}
-        	//serviceIndex = index;
+        	cursor = managedQuery(AttaBaseProvider.CONTENT_URI_BASE, null, null, null, null);
+            columns = new String[] {AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME};
+            to = new int[] {R.id.name_entry};
+            adapter = new SimpleCursorAdapter(this, R.layout.base_list_item, cursor, columns, to);
         	break;
         case VIEW_SERVICES:
+    		cursor = managedQuery(AttaBaseProvider.CONTENT_URI_SERVICE, null, null, null, null);
+            columns = new String[] {AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME};
+            to = new int[] {R.id.name_entry};
+            adapter = new SimpleCursorAdapter(this, R.layout.base_list_item, cursor, columns, to);
+        	break;
 		default:
+			cursor = null;
+			adapter = null;
 			break;
 		}
         
@@ -205,55 +218,35 @@ public class ActivityWizard extends SherlockActivity {
         	headerLl.setVisibility(LinearLayout.VISIBLE);
         }
         
-        
-        // INITIALIZE THE LIST
-        ListView locations = (ListView) ll.findViewById(R.id.baseListView1);
-		locations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				transitionToNewView(getNextStep(mCurrentStep), (int)arg3);
-			}
-		});
-        // POPULATE THE LIST WITH LOCATIONS
-        locations.setAdapter(mAdapter);
-
+        if (adapter != null){
+	        // INITIALIZE THE LIST
+	        ListView locations = (ListView) ll.findViewById(R.id.baseListView1);
+			locations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+						long id) {
+					Cursor c = (Cursor)adapter.getItem(arg2);
+					int test = c.getInt(c.getColumnIndex(AttaBaseContract.ServiceSchema._ID));
+					transitionToNewView(getNextStep(mCurrentStep), id);
+				}
+			});
+	        // POPULATE THE LIST WITH LOCATIONS
+	        locations.setAdapter(adapter);
+        }
         return ll;
 	}
-
-	@SuppressWarnings("deprecation")
-    private void setCursorAdapterServicesAll(){
-    	Cursor services = mDbHelper.getAllServices();
-    	startManagingCursor(services);
-        String[] columns = new String[] {AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME};
-        int to[] = new int[] {R.id.name_entry};
-        mAdapter = new SimpleCursorAdapter(this, R.layout.base_list_item, services, columns, to);
-    }
 	
-    @SuppressWarnings("deprecation")
-    private void setCursorAdapterService(int service){
-    	Cursor bases = mDbHelper.getAllBases(service);
-    	startManagingCursor(bases);
-        String[] columns = new String[] {AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME};
-        int to[] = new int[] {R.id.name_entry};
-        mAdapter = new SimpleCursorAdapter(this, R.layout.base_list_item, bases, columns, to);
-    }
-
-	/* BUTTON CALLBACKS */
+	/* BUTTON CALLBACK */
     public void stepContinue(View view) {
     	if (mCurrentStep != STEP.STEP_3)
     		transitionToNewView(getNextStep(mCurrentStep), AttaBaseContract.NO_BASE);
     	else {
-    		wrapUpWizard();
+        	SharedPreferences.Editor editor = prefs.edit();
+        	editor.putLong(AttaBaseContract.PREFS_HOME_SERVICE_INT, mCurrentService);
+        	editor.putLong(AttaBaseContract.PREFS_HOME_BASE_INT, mCurrentBase);
+        	editor.commit();
+        	
+        	finish();
     	}
     }
-
-	private void wrapUpWizard() {
-    	SharedPreferences.Editor editor = prefs.edit();
-    	editor.putInt(AttaBaseContract.PREFS_HOME_SERVICE_INT, mCurrentService);
-    	editor.putInt(AttaBaseContract.PREFS_HOME_BASE_INT, mCurrentBase);
-    	editor.commit();
-    	
-    	finish();
-	}
 
 }
