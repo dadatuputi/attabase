@@ -76,6 +76,9 @@
             android:label="@string/title_activity_activity_action_bar"
             android:theme="@style/Theme.Sherlock" >
         </activity>
+		<provider android:name=".AttaBaseProvider"
+		         android:authorities="co.bantamstudio.attabase.AttaBaseProvider" />
+        
     </application>
 
 </manifest>

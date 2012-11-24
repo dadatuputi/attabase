@@ -5,25 +5,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 public class ActivityHome extends Activity {
 	
 	public final static String EXTRA_MESSAGE = "co.bantamstudio.attaBase.MESSAGE";
-	private LocationDbHelper mDbHelper;
+	//private LocationDbHelper mDbHelper;
 	private Base mCurrentBase;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        mDbHelper = new LocationDbHelper(this.getApplicationContext());
+        //mDbHelper = new LocationDbHelper(this.getApplicationContext());
     }
     
     @Override
@@ -33,8 +28,8 @@ public class ActivityHome extends Activity {
         // Load boolean flag 
         SharedPreferences prefs = getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
         boolean hasImported = prefs.getBoolean(AttaBaseContract.PREFS_IMPORTED_BOOL, false);
-        int base = prefs.getInt(AttaBaseContract.PREFS_HOME_BASE_INT, AttaBaseContract.NO_BASE);
-        int service = prefs.getInt(AttaBaseContract.PREFS_HOME_SERVICE_INT, AttaBaseContract.NO_SERVICE);
+        long base = prefs.getLong(AttaBaseContract.PREFS_HOME_BASE_INT, AttaBaseContract.NO_BASE);
+        long service = prefs.getLong(AttaBaseContract.PREFS_HOME_SERVICE_INT, AttaBaseContract.NO_SERVICE);
         
         // If initial import hasn't occurred, start import activity
         if (!hasImported){
@@ -47,11 +42,11 @@ public class ActivityHome extends Activity {
         }        
         
         try {
-			mCurrentBase = new Base(mDbHelper, new Service(this,mDbHelper,service), base);
+			mCurrentBase = new Base(this, new Service(this,service), base);
 		} catch (Exception e) {
 			mCurrentBase = null;
-			Log.d("Exception", e.getMessage());
 		}
+        setContentView(R.layout.activity_home);
         populateHomeScreen();
     }
     
@@ -67,7 +62,7 @@ public class ActivityHome extends Activity {
     	
         // LOAD LAYOUT XML    
         LinearLayout ll = (LinearLayout) findViewById(R.id.addressBlockSmall);
-        if (mCurrentBase.getLocation()!=null){
+        if (mCurrentBase != null && mCurrentBase.getLocation()!=null){
         	((TextView)ll.findViewById(R.id.baseName)).setText(mCurrentBase.getBaseString());
         	((TextView)ll.findViewById(R.id.address1)).setText(mCurrentBase.getLocation().getLocationAddress1());
         	((TextView)ll.findViewById(R.id.address2)).setText(mCurrentBase.getLocation().getLocationAddress2());

@@ -24,6 +24,9 @@ import au.com.bytecode.opencsv.CSVReader;
 
 public class ActivityImportCSV extends Activity {
 
+	private SQLiteDatabase mDb;
+	private AttaBaseDatabase mAttaBaseDatabase;
+	
 	ProgressBar importProgress;
 	TextView basesImported;
 	TextView locationsImported;
@@ -33,6 +36,7 @@ public class ActivityImportCSV extends Activity {
         super.onCreate(savedInstanceState);
         //getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.activity_import_csv_importing);
+        mAttaBaseDatabase = new AttaBaseDatabase(this);
     }
 
     @Override
@@ -48,6 +52,8 @@ public class ActivityImportCSV extends Activity {
         // Load boolean flag 
         SharedPreferences prefs = getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
         boolean hasImported = prefs.getBoolean(AttaBaseContract.PREFS_IMPORTED_BOOL, false);
+        
+        //TODO when resuming, go to process if it's still in progress
         
         if (hasImported)
         	showCompletedViews();
@@ -68,11 +74,10 @@ public class ActivityImportCSV extends Activity {
     public void initialImport(View view) {
     	setContentView(R.layout.activity_import_csv_importing);
     	
-        LocationDbHelper mDbHelper = new LocationDbHelper(this);
-        final SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        mDb = mAttaBaseDatabase.getReadableDb();
         
         // FOR TESTING
-        mDbHelper.onUpgrade(db, 1, 1);
+        //mDbHelper.onUpgrade(mDb, 1, 1);
         
         importProgress = (ProgressBar)findViewById(R.id.importProgressBar);
         //imSportProgress.setMax(AttaBaseContract.TOTAL_ROWS);
@@ -80,7 +85,7 @@ public class ActivityImportCSV extends Activity {
         locationsImported = (TextView)findViewById(R.id.textView5);
         
         
-        new ImportCSV().execute(db);
+        new ImportCSV().execute(mDb);
     }
     
     public void leaveImport(View view){
@@ -202,6 +207,9 @@ public class ActivityImportCSV extends Activity {
 					        locationType.put(dir, (int) newRowId);
 						}
 						
+						// Create searchable string
+						String searchableLocation = nextLine[3] + " " +  nextLine[9] + " " + nextLine[10] + " " + nextLine[11];
+						
 						
 						// Add Listing to Location Table
 						insertLocationStmt.bindString(1, nextLine[3].trim());
@@ -224,7 +232,7 @@ public class ActivityImportCSV extends Activity {
 					    insertLocationStmt.bindString(18, nextLine[20].trim());
 					    insertLocationStmt.bindString(19, nextLine[21].trim());
 					    insertLocationStmt.bindLong(20, locationType.get(dir));
-					    insertLocationStmt.bindLong(21, installation.get(base));
+					    insertLocationStmt.bindString(21, searchableLocation);
 					    newRowId = insertLocationStmt.executeInsert();
 					    
 						count++;

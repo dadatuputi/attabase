@@ -1,5 +1,6 @@
 package co.bantamstudio.attabase;
 
+import android.app.SearchManager;
 import android.provider.BaseColumns;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
@@ -15,6 +16,7 @@ public class AttaBaseContract {
 	
 	public static final String IMPORT_SOURCE_CSV = "attaBase.csv"; 
 	public static final String APP_STRING = "co.bantamstudio.attabase";
+	public static final String APP_STRING_VND = "vnd.bantamstudio.attabase";
 	public static final String BASE_LIST_STATE = APP_STRING+"_base_list_state";
 	// STATES TO PASS TO BASE LIST
 	public static final String BASE_LIST_BASE = "base_list_base";
@@ -30,12 +32,41 @@ public class AttaBaseContract {
 	
 	private AttaBaseContract() {}
 	
+	public class AttaBaseSchema implements BaseColumns{
+		public static final String TABLE_ALL = 
+				AttaBaseContract.BaseSchema.TABLE_NAME + " a" + 
+				" INNER JOIN " + AttaBaseContract.ServiceSchema.TABLE_NAME + " b ON " + 
+					"a." + AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_SERVICE + " = " + 
+					"b." + AttaBaseContract.ServiceSchema._ID + 
+				" INNER JOIN " + AttaBaseContract.LocationSchema.TABLE_NAME + " c ON " +
+					"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_BASE + " = " +
+					"a." + AttaBaseContract.BaseSchema._ID +
+				" INNER JOIN " + AttaBaseContract.LocationTypeSchema.TABLE_NAME + " d ON " +
+					"d." + AttaBaseContract.LocationTypeSchema._ID + " = " +
+					"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_TYPE;
+		
+		public static final String TABLE_SERVICE_BASE =
+				AttaBaseContract.BaseSchema.TABLE_NAME + " a" + 
+				" INNER JOIN " + AttaBaseContract.ServiceSchema.TABLE_NAME + " b ON " + 
+					"a." + AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_SERVICE + " = " + 
+					"b." + AttaBaseContract.ServiceSchema._ID;
+		
+		public static final String TABLE_SERVICE_BASE_LOC = 
+				AttaBaseContract.BaseSchema.TABLE_NAME + " a" + 
+				" INNER JOIN " + AttaBaseContract.ServiceSchema.TABLE_NAME + " b ON " + 
+					"a." + AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_SERVICE + " = " + 
+					"b." + AttaBaseContract.ServiceSchema._ID + 
+				" INNER JOIN " + AttaBaseContract.LocationSchema.TABLE_NAME + " c ON " +
+					"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_BASE + " = " +
+					"a." + AttaBaseContract.BaseSchema._ID;
+	}
+	
 	public class BaseSchema implements BaseColumns{
 		public static final String TABLE_NAME = "base";
-		public static final String COLUMN_NAME_BASE_NAME = "basename";
+		public static final String COLUMN_NAME_BASE_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1;
 		public static final String COLUMN_NAME_BASE_SERVICE = "baseservice";
 		public static final String STRING_CREATE_TABLE = 
-				"CREATE TABLE " + TABLE_NAME + " (" +
+				"CREATE VIRTUAL TABLE " + TABLE_NAME + " USING fts3(" +
 						_ID + " INTEGER PRIMARY KEY," +
 						COLUMN_NAME_BASE_NAME + " TEXT," +
 						COLUMN_NAME_BASE_SERVICE + " INTEGER REFERENCES " + 
@@ -51,9 +82,9 @@ public class AttaBaseContract {
 	}
 	public class ServiceSchema implements BaseColumns{
 		public static final String TABLE_NAME = "service";
-		public static final String COLUMN_NAME_SERVICE_NAME = "servicename";
+		public static final String COLUMN_NAME_SERVICE_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1;
 		public static final String STRING_CREATE_TABLE = 
-				"CREATE TABLE " + TABLE_NAME + " (" +
+				"CREATE VIRTUAL TABLE " + TABLE_NAME + " USING fts3(" +
 						_ID + " INTEGER PRIMARY KEY," +
 						COLUMN_NAME_SERVICE_NAME + " TEXT" + 
 				")";
@@ -68,7 +99,7 @@ public class AttaBaseContract {
 		public static final String COLUMN_NAME_DIRECTORY_NAME = "directoryname";
 		public static final String BASE_ADDRESS_TYPE = "Location";
 		public static final String STRING_CREATE_TABLE = 
-				"CREATE TABLE " + TABLE_NAME + " (" +
+				"CREATE VIRTUAL TABLE " + TABLE_NAME + " USING fts3(" +
 						_ID + " INTEGER PRIMARY KEY," +
 						COLUMN_NAME_DIRECTORY_NAME + " TEXT" +
 				")";
@@ -80,7 +111,7 @@ public class AttaBaseContract {
 	}
 	public class LocationSchema implements BaseColumns{
 		public static final String TABLE_NAME = "location";
-		public static final String COLUMN_NAME_LOCATION_NAME = "locationname";
+		public static final String COLUMN_NAME_LOCATION_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1;
 		public static final String COLUMN_NAME_LOCATION_TYPE = "locationtype";
 		public static final String COLUMN_NAME_DOD_ID = "dod_id";
 		public static final String COLUMN_NAME_BASE = "base";
@@ -101,9 +132,10 @@ public class AttaBaseContract {
 		public static final String COLUMN_NAME_WEBSITE1 = "website1";
 		public static final String COLUMN_NAME_WEBSITE2 = "website2";
 		public static final String COLUMN_NAME_WEBSITE3 = "website3";
+		public static final String COLUMN_NAME_SEARCH_LOCATION = SearchManager.SUGGEST_COLUMN_TEXT_2;
 		
 		public static final String STRING_CREATE_TABLE = 
-				"CREATE TABLE " + TABLE_NAME + " (" +
+				"CREATE VIRTUAL TABLE " + TABLE_NAME + " USING fts3(" +
 						_ID + " INTEGER PRIMARY KEY," +
 						COLUMN_NAME_LOCATION_NAME + " TEXT," +
 						COLUMN_NAME_DOD_ID + " INTEGER, " +
@@ -131,7 +163,9 @@ public class AttaBaseContract {
 							
 						COLUMN_NAME_BASE + " INTEGER REFERENCES " + 
 							AttaBaseContract.BaseSchema.TABLE_NAME + "(" + 
-							AttaBaseContract.BaseSchema._ID + ") ON UPDATE CASCADE " +
+							AttaBaseContract.BaseSchema._ID + ") ON UPDATE CASCADE, " +
+							
+						COLUMN_NAME_SEARCH_LOCATION + " TEXT " +
 				")";
 		public static final String STRING_DROP_TABLE =
 				"DROP TABLE IF EXISTS " + TABLE_NAME;
@@ -157,7 +191,8 @@ public class AttaBaseContract {
 						COLUMN_NAME_WEBSITE2 + ", " + 
 						COLUMN_NAME_WEBSITE3 + ", " + 
 						COLUMN_NAME_LOCATION_TYPE + ", " + 
-						COLUMN_NAME_BASE + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+						COLUMN_NAME_BASE + ", " +
+						COLUMN_NAME_SEARCH_LOCATION + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	}
 	
 	public static Animation horizontalAnimation(float startingX, int direction) {
