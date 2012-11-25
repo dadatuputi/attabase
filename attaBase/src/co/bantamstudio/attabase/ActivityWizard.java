@@ -4,6 +4,7 @@ import co.bantamstudio.attabase.ActivityBaseList.VIEW_TYPE;
 import com.actionbarsherlock.ActionBarSherlock;
 import com.actionbarsherlock.app.SherlockActivity;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -185,9 +186,11 @@ public class ActivityWizard extends SherlockActivity {
 			} catch (Exception e1) {
 				Log.d("Exception", e1.getMessage());
 			}
-        	cursor = managedQuery(AttaBaseProvider.CONTENT_URI_BASE, null, null, null, null);
-            columns = new String[] {AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME};
-            to = new int[] {R.id.name_entry};
+        	Uri serviceUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_SERVICE, String.valueOf(index));
+        	serviceUri = Uri.withAppendedPath(serviceUri, "base");
+        	cursor = managedQuery(serviceUri, null, null, null, null);
+            columns = new String[] {AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME, AttaBaseContract.LocationSchema.COLUMN_NAME_NICE_LOCATION};
+            to = new int[] {R.id.name_entry, R.id.name_entry_sub};
             adapter = new SimpleCursorAdapter(this, R.layout.base_list_item, cursor, columns, to);
         	break;
         case VIEW_SERVICES:
@@ -224,8 +227,6 @@ public class ActivityWizard extends SherlockActivity {
 			locations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 						long id) {
-					Cursor c = (Cursor)adapter.getItem(arg2);
-					int test = c.getInt(c.getColumnIndex(AttaBaseContract.ServiceSchema._ID));
 					transitionToNewView(getNextStep(mCurrentStep), id);
 				}
 			});

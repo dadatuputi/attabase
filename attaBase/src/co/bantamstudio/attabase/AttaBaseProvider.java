@@ -1,5 +1,6 @@
 package co.bantamstudio.attabase;
 
+import java.util.List;
 import java.util.Locale;
 
 import android.app.SearchManager;
@@ -36,6 +37,7 @@ public class AttaBaseProvider extends ContentProvider {
 	private static final int SEARCH_SUGGEST_BASE = 6;
 	private static final int SEARCH_SUGGEST_LOCATION = 7;
 	private static final int GET_BASE_ADDRESS = 8;
+	private static final int GET_SERVICE_BASES = 9;
 	private static final UriMatcher sURIMatcher = buildUriMatcher();
 	
 	private static UriMatcher buildUriMatcher() {
@@ -43,6 +45,7 @@ public class AttaBaseProvider extends ContentProvider {
 		// to get definitions...
 		matcher.addURI(AUTHORITY, "service", SEARCH_SERVICES);
 		matcher.addURI(AUTHORITY, "service/#", GET_SERVICE);
+		matcher.addURI(AUTHORITY, "service/#/base", GET_SERVICE_BASES);
 		matcher.addURI(AUTHORITY, "base", SEARCH_BASES);
 		matcher.addURI(AUTHORITY, "base/#", GET_BASE);
 		matcher.addURI(AUTHORITY, "base/#/address", GET_BASE_ADDRESS);
@@ -109,6 +112,8 @@ public class AttaBaseProvider extends ContentProvider {
 			if(selectionArgs == null)
 				return allServices();
 			return searchServices(selectionArgs[0]);
+		case GET_SERVICE_BASES:
+			return allBases(uri);
 		case SEARCH_LOCATIONS:
 			if(selectionArgs == null)
 				return allLocations();
@@ -164,11 +169,26 @@ public class AttaBaseProvider extends ContentProvider {
 	}
 	private Cursor allBases() {
 		String[] columns = new String[] {
-				BaseColumns._ID,
-				AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION
+				"a." + BaseColumns._ID,
+				"a." + AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION
 		};
-		return mAttaBaseDatabase.getBase(columns);
+		return mAttaBaseDatabase.getService(columns);
+	}
+	private Cursor allBases(Uri uri) {
+		List<String> segments = uri.getPathSegments();
+		String serviceId = segments.get(1);
+		String[] columns = new String[] {
+				"a." + BaseColumns._ID,
+				"a." + AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION,
+//				"(c." + AttaBaseContract.LocationSchema.COLUMN_NAME_CITY + 
+//					"|| ' ' ||c." + AttaBaseContract.LocationSchema.COLUMN_NAME_STATE + 
+//					"|| ' ' ||c." + AttaBaseContract.LocationSchema.COLUMN_NAME_COUNTRY + 
+//					") AS " + AttaBaseContract.LocationSchema.TEMP_COLUMN_NAME_LOCATION
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_NICE_LOCATION
+		};
+		return mAttaBaseDatabase.getBases(serviceId, columns);
 	}
 
 
@@ -205,9 +225,11 @@ public class AttaBaseProvider extends ContentProvider {
 	private Cursor getBase(Uri uri) {
 		String baseId = uri.getLastPathSegment();
 		String[] columns = new String[] {
-				BaseColumns._ID,
-				AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION
+				"c." + BaseColumns._ID,
+				"a." + AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_NICE_LOCATION,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME
 		};
 		return mAttaBaseDatabase.getBase(baseId, columns);
 	}
@@ -222,59 +244,64 @@ public class AttaBaseProvider extends ContentProvider {
 	private Cursor getLocation(Uri uri) {
 		String locId = uri.getLastPathSegment();
 		String[] columns = new String[] {
-				BaseColumns._ID,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS1,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS2,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS3,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS4,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_CITY,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_STATE,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_ZIP_CODE,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_COUNTRY,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE1,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE2,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE3,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_FAX,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_DSN,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_DSN_FAX,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE1,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE2,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE3,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_BASE,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_TYPE,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION,
+				"c." + BaseColumns._ID,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS1,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS2,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS3,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS4,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_CITY,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_STATE,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_ZIP_CODE,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_COUNTRY,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE1,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE2,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE3,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_FAX,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_DSN,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_DSN_FAX,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE1,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE2,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE3,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_BASE,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_TYPE,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_DOD_ID
 		};
 		return mAttaBaseDatabase.getLocation(locId, columns);
 	}
 	private Cursor getBaseAddress(Uri uri) {
 		// TODO get it to return a proper address. Right now it returns the location at the base ID
-		String baseId = uri.getLastPathSegment();
+		List<String> segments = uri.getPathSegments();
+		String baseId = segments.get(1);
 		String[] columns = new String[] {
-				BaseColumns._ID,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS1,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS2,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS3,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS4,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_CITY,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_STATE,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_ZIP_CODE,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_COUNTRY,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE1,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE2,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE3,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_FAX,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_DSN,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_DSN_FAX,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE1,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE2,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE3,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_BASE,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_TYPE,
-				AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION,
+				"c." + BaseColumns._ID,
+				"a." + AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS1,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS2,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS3,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS4,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_CITY,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_STATE,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_ZIP_CODE,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_COUNTRY,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE1,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE2,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE3,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_FAX,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_DSN,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_DSN_FAX,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE1,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE2,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE3,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_BASE,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_TYPE,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION,
+				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_DOD_ID,
+				"d." + AttaBaseContract.LocationTypeSchema.COLUMN_NAME_DIRECTORY_NAME,
 		};
-		return mAttaBaseDatabase.getLocation(baseId, columns);
+		return mAttaBaseDatabase.getBaseAddress(baseId, columns);
 	}
 
 

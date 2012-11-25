@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.net.Uri.Builder;
 import co.bantamstudio.attabase.ActivityBaseList.SERVICE;
 
@@ -22,9 +23,8 @@ public class Service {
 		
 		// GET SERVICE TEXT
 		ContentResolver cr = context.getContentResolver();
-		Builder baseUri = AttaBaseProvider.CONTENT_URI_SERVICE.buildUpon();
-		baseUri.appendPath("/" + serviceIndex);
-		Cursor serviceInfo = cr.query(baseUri.build(), null, null, null, null);
+		Uri serviceUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_SERVICE, String.valueOf(serviceIndex));
+		Cursor serviceInfo = cr.query(serviceUri, null, null, null, null);
 		//Cursor serviceInfo = mDbHelper.getService(serviceIndex);
     	if (serviceInfo.moveToFirst()){
         	serviceString = serviceInfo.getString(serviceInfo.getColumnIndex(AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME));

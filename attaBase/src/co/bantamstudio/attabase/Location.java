@@ -3,6 +3,7 @@ package co.bantamstudio.attabase;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.net.Uri.Builder;
 
 public class Location {
@@ -82,9 +83,8 @@ public class Location {
 		this.base = base;
 		
 		ContentResolver cr = context.getContentResolver();
-		Builder baseUri = AttaBaseProvider.CONTENT_URI_LOCATION.buildUpon();
-		baseUri.appendPath("/" + locIndex);
-		Cursor location = cr.query(baseUri.build(), null, null, null, null);
+		Uri locationUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_LOCATION, String.valueOf(locIndex));
+		Cursor location = cr.query(locationUri, null, null, null, null);
         //Cursor location = mDbHelper.getLocation(locIndex);
         if (location.moveToFirst()){
         	locationName = location.getString(location.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME));
