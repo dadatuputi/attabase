@@ -207,6 +207,14 @@ public class ActivityImportCSV extends Activity {
 					        locationType.put(dir, (int) newRowId);
 						}
 						
+						// Create nice location string
+						String city = nextLine[9];
+						String state = nextLine[10];
+						String country = nextLine[11];
+						String niceLocation = (city.equalsIgnoreCase("")?"":city+", ") + (state.equalsIgnoreCase("")?"":state+", ") + (country.equalsIgnoreCase("")?"":country+", ");
+						if (niceLocation.length() > 2)
+							niceLocation = niceLocation.substring(0, niceLocation.length()-2);
+						
 						// Create searchable string
 						String searchableLocation = nextLine[3] + " " +  nextLine[9] + " " + nextLine[10] + " " + nextLine[11];
 						
@@ -232,7 +240,9 @@ public class ActivityImportCSV extends Activity {
 					    insertLocationStmt.bindString(18, nextLine[20].trim());
 					    insertLocationStmt.bindString(19, nextLine[21].trim());
 					    insertLocationStmt.bindLong(20, locationType.get(dir));
-					    insertLocationStmt.bindString(21, searchableLocation);
+					    insertLocationStmt.bindLong(21, installation.get(base));
+					    insertLocationStmt.bindString(22, searchableLocation);
+					    insertLocationStmt.bindString(23, niceLocation);
 					    newRowId = insertLocationStmt.executeInsert();
 					    
 						count++;

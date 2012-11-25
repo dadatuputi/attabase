@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -156,17 +157,26 @@ public class ActivityBaseList extends SherlockActivity {
     	
     	switch (mCurrentView) {
         case VIEW_BASES:
-        	cursor = managedQuery(AttaBaseProvider.CONTENT_URI_BASE, null, null, null, null);
-            columns = new String[] {AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME};
-            to = new int[] {R.id.name_entry};
+        	Uri serviceUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_SERVICE, String.valueOf(service.getServiceIndex()));
+        	serviceUri = Uri.withAppendedPath(serviceUri, "base");
+        	cursor = managedQuery(serviceUri, null, null, null, null);
+            columns = new String[] {AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME, AttaBaseContract.LocationSchema.COLUMN_NAME_NICE_LOCATION};
+            to = new int[] {R.id.name_entry, R.id.name_entry_sub};
             adapter = new SimpleCursorAdapter(this, R.layout.base_list_item, cursor, columns, to);
         	break;
         case VIEW_SERVICES:
     		cursor = managedQuery(AttaBaseProvider.CONTENT_URI_SERVICE, null, null, null, null);
-            columns = new String[] {AttaBaseContract.ServiceSchema._ID, AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME};
-            to = new int[] {0, R.id.name_entry};
+            columns = new String[] {AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME};
+            to = new int[] {R.id.name_entry};
             adapter = new SimpleCursorAdapter(this, R.layout.base_list_item, cursor, columns, to);
         	break;
+        case VIEW_BASE:
+        	Uri baseLocationsUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_BASE, String.valueOf(base.getBaseIndex()));
+        	cursor = managedQuery(baseLocationsUri, null, null, null, null);
+        	columns = new String[] {AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME, AttaBaseContract.LocationSchema.COLUMN_NAME_NICE_LOCATION};
+            to = new int[] {R.id.name_entry, R.id.name_entry_sub};
+            adapter = new SimpleCursorAdapter(this, R.layout.base_list_item, cursor, columns, to);
+            break;
 		default:
 			cursor = null;
 			adapter = null;
@@ -264,15 +274,24 @@ public class ActivityBaseList extends SherlockActivity {
         // LOAD LAYOUT XML    
         LinearLayout ll = (LinearLayout) View.inflate(this, R.layout.base_location_view, null);
         
-        TextView locationNameText = (TextView) ll.findViewById(R.id.locationName);
-        locationNameText.setText(loc.getLocationName());
-        TextView locationPhoneText = (TextView) ll.findViewById(R.id.locationPhone);
-        locationPhoneText.setText(loc.getLocationPhone1());
-        TextView locationCityText = (TextView) ll.findViewById(R.id.locationCity);
-        locationCityText.setText(loc.getLocationCity());
-        TextView locationCountryText = (TextView) ll.findViewById(R.id.locationCountry);
-        locationCountryText.setText(loc.getLocationCountry());
-        
+        ((TextView) ll.findViewById(R.id.baseName)).setText(loc.getLocationName());
+        ((TextView) ll.findViewById(R.id.address1)).setText(loc.getLocationAddress1());
+        ((TextView) ll.findViewById(R.id.address2)).setText(loc.getLocationAddress2());
+        ((TextView) ll.findViewById(R.id.address3)).setText(loc.getLocationAddress3());
+        ((TextView) ll.findViewById(R.id.address4)).setText(loc.getLocationAddress4());
+        ((TextView) ll.findViewById(R.id.phone1)).setText(loc.getLocationPhone1());
+        ((TextView) ll.findViewById(R.id.phone2)).setText(loc.getLocationPhone2());
+        ((TextView) ll.findViewById(R.id.phone3)).setText(loc.getLocationPhone3());
+        ((TextView) ll.findViewById(R.id.fax)).setText(loc.getLocationPhoneFax());
+        ((TextView) ll.findViewById(R.id.dsn)).setText(loc.getDsn());
+        ((TextView) ll.findViewById(R.id.dsn_fax)).setText(loc.getDsnFax());
+        ((TextView) ll.findViewById(R.id.city)).setText(loc.getLocationCity());
+        ((TextView) ll.findViewById(R.id.state)).setText(loc.getLocationState());
+        ((TextView) ll.findViewById(R.id.country)).setText(loc.getLocationCountry());
+        ((TextView) ll.findViewById(R.id.website1)).setText(loc.getWebsite1());
+        ((TextView) ll.findViewById(R.id.website2)).setText(loc.getWebsite2());
+        ((TextView) ll.findViewById(R.id.website3)).setText(loc.getWebsite3());
+        ((TextView) ll.findViewById(R.id.zip)).setText(loc.getLocationZip());     
         return ll;
     }
     
@@ -284,7 +303,6 @@ public class ActivityBaseList extends SherlockActivity {
     	case VIEW_SERVICES:
     		mCurrentService = null;
     		mCurrentBase = null;
-    		//setCursorAdapterServicesAll();
         	ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
@@ -296,7 +314,6 @@ public class ActivityBaseList extends SherlockActivity {
 				Log.d("Exception", e1.getMessage());
 			};
     		mCurrentBase = null;
-    		//setCursorAdapterService(index);
         	ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
@@ -307,15 +324,13 @@ public class ActivityBaseList extends SherlockActivity {
 			} catch (Exception e) {
 				Log.d("Exception", e.getMessage());
 			}
-    		//setCursorAdapterBaseLocationsAll(index);
     		ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
         	break;
     	case VIEW_LOCATION:
-    		//setCursorAdapterBaseLocation(loc);
     		try {
-				mCurrentLocation = new Location(this, index,mCurrentService, mCurrentBase);
+				mCurrentLocation = new Location(this, index, mCurrentService, mCurrentBase);
 			} catch (Exception e) {
 				Log.d("Exception", e.getMessage());
 			}

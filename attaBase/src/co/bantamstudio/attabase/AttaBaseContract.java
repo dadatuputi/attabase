@@ -66,7 +66,7 @@ public class AttaBaseContract {
 		public static final String COLUMN_NAME_BASE_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1;
 		public static final String COLUMN_NAME_BASE_SERVICE = "baseservice";
 		public static final String STRING_CREATE_TABLE = 
-				"CREATE VIRTUAL TABLE " + TABLE_NAME + " USING fts3(" +
+				"CREATE TABLE " + TABLE_NAME + " (" +
 						_ID + " INTEGER PRIMARY KEY," +
 						COLUMN_NAME_BASE_NAME + " TEXT," +
 						COLUMN_NAME_BASE_SERVICE + " INTEGER REFERENCES " + 
@@ -84,7 +84,7 @@ public class AttaBaseContract {
 		public static final String TABLE_NAME = "service";
 		public static final String COLUMN_NAME_SERVICE_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1;
 		public static final String STRING_CREATE_TABLE = 
-				"CREATE VIRTUAL TABLE " + TABLE_NAME + " USING fts3(" +
+				"CREATE TABLE " + TABLE_NAME + " (" +
 						_ID + " INTEGER PRIMARY KEY," +
 						COLUMN_NAME_SERVICE_NAME + " TEXT" + 
 				")";
@@ -99,7 +99,7 @@ public class AttaBaseContract {
 		public static final String COLUMN_NAME_DIRECTORY_NAME = "directoryname";
 		public static final String BASE_ADDRESS_TYPE = "Location";
 		public static final String STRING_CREATE_TABLE = 
-				"CREATE VIRTUAL TABLE " + TABLE_NAME + " USING fts3(" +
+				"CREATE TABLE " + TABLE_NAME + " (" +
 						_ID + " INTEGER PRIMARY KEY," +
 						COLUMN_NAME_DIRECTORY_NAME + " TEXT" +
 				")";
@@ -133,9 +133,11 @@ public class AttaBaseContract {
 		public static final String COLUMN_NAME_WEBSITE2 = "website2";
 		public static final String COLUMN_NAME_WEBSITE3 = "website3";
 		public static final String COLUMN_NAME_SEARCH_LOCATION = SearchManager.SUGGEST_COLUMN_TEXT_2;
+		public static final String COLUMN_NAME_NICE_LOCATION = "nice_locations";
+		public static final String TEMP_COLUMN_NAME_LOCATION = "temp_location";
 		
 		public static final String STRING_CREATE_TABLE = 
-				"CREATE VIRTUAL TABLE " + TABLE_NAME + " USING fts3(" +
+				"CREATE TABLE " + TABLE_NAME + " (" +
 						_ID + " INTEGER PRIMARY KEY," +
 						COLUMN_NAME_LOCATION_NAME + " TEXT," +
 						COLUMN_NAME_DOD_ID + " INTEGER, " +
@@ -155,7 +157,8 @@ public class AttaBaseContract {
 						COLUMN_NAME_DSN_FAX + " TEXT, " +
 						COLUMN_NAME_WEBSITE1 + " TEXT, " +
 						COLUMN_NAME_WEBSITE2 + " TEXT, " +
-						COLUMN_NAME_WEBSITE3 + " TEXT, " +			
+						COLUMN_NAME_WEBSITE3 + " TEXT, " +	
+						COLUMN_NAME_NICE_LOCATION + " TEXT, " +
 
 						COLUMN_NAME_LOCATION_TYPE + " INTEGER REFERENCES " + 
 							AttaBaseContract.LocationTypeSchema.TABLE_NAME + "(" + 
@@ -192,7 +195,8 @@ public class AttaBaseContract {
 						COLUMN_NAME_WEBSITE3 + ", " + 
 						COLUMN_NAME_LOCATION_TYPE + ", " + 
 						COLUMN_NAME_BASE + ", " +
-						COLUMN_NAME_SEARCH_LOCATION + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+						COLUMN_NAME_SEARCH_LOCATION + ", " +
+						COLUMN_NAME_NICE_LOCATION + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	}
 	
 	public static Animation horizontalAnimation(float startingX, int direction) {

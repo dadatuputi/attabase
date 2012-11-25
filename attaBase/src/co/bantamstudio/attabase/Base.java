@@ -20,24 +20,28 @@ public class Base {
 		this.baseIndex = baseIndex;
 		
 		ContentResolver cr = context.getContentResolver();
-		Uri baseUri = Uri.parse(AttaBaseProvider.CONTENT_URI_BASE.toString()+"/"+baseIndex);
-		Cursor baseInfo = cr.query(baseUri, null, null, null, null);
+		//Uri baseUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_BASE, String.valueOf(baseIndex));
+		//Cursor baseInfo = cr.query(baseUri, null, null, null, null);
 		//Cursor baseInfo = mDbHelper.getBase(baseIndex);
-    	if (baseInfo.moveToFirst()){
-    		baseString = baseInfo.getString(baseInfo.getColumnIndex(AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME));
-        }
-    	else {
-    		baseInfo.close();
-    		throw new Exception("no base found");
-    	}
-    	baseInfo.close();
+    	//if (baseInfo.moveToFirst()){
+    	//	baseString = baseInfo.getString(baseInfo.getColumnIndex(AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME));
+        //}
+    	//else {
+    	//	baseInfo.close();
+    	//	throw new Exception("no base found");
+    	//}
+    	//baseInfo.close();
     	
-    	baseUri = Uri.parse(AttaBaseProvider.CONTENT_URI_BASE.toString()+"/"+baseIndex+"/address");
+		Uri baseUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_BASE, String.valueOf(baseIndex));
+		baseUri = Uri.withAppendedPath(baseUri, "address");
     	Cursor locationInfo = cr.query(baseUri, null, null, null, null);
-    	//Cursor locationInfo = mDbHelper.getBaseAddress(baseIndex);
     	if (locationInfo.moveToFirst()){
+    		baseString = locationInfo.getString(1);
     		location = new Location(service, this, locationInfo.getInt(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema._ID)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME)),
+    				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE1)),
+    				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE2)),
+    				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE3)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_TYPE)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_DOD_ID)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS1)),
@@ -48,18 +52,29 @@ public class Base {
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_STATE)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_COUNTRY)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_ZIP_CODE)),
-    				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE1)),
-    				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE2)),
-    				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE3)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_FAX)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_DSN)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_DSN_FAX)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE1)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE2)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE3)));
+    		locationInfo.close();
     	}
-    	else
+    	else {
+    		// TODO test for locations without "Location"
     		location = null;
+    		locationInfo.close();
+    		baseUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_BASE, String.valueOf(baseIndex));
+    		Cursor baseInfo = cr.query(baseUri, null, null, null, null);
+        	if (baseInfo.moveToFirst()){
+        		baseString = baseInfo.getString(baseInfo.getColumnIndex(AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME));
+        		baseInfo.close();
+            }
+        	else {
+        		baseInfo.close();
+        		throw new Exception("no base found");
+        	}
+    	}
 	}
 
 
@@ -76,7 +91,7 @@ public class Base {
 		return service;
 	}
 	
-	public long getBaseIndes(){
+	public long getBaseIndex(){
 		return baseIndex;
 	}
 	

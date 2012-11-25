@@ -23,11 +23,11 @@ public class AttaBaseDatabase {
 	
 	private static HashMap<String, String> buildColumnMap() {
 		HashMap<String,String> map = new HashMap<String,String>();
+		map.put(BaseColumns._ID, BaseColumns._ID);
 		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME, AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME);
 		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION, AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION);
 		map.put(AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME, AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME);
 		map.put(AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME, AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME);
-		map.put(BaseColumns._ID, BaseColumns._ID);
 		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS1, AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS1);
 		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS2, AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS2);
 		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS3, AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS3);
@@ -56,38 +56,59 @@ public class AttaBaseDatabase {
 
 	// GET OBJECTS
 	public Cursor getBase(String baseId, String[] columns) {
-		String selection = "rowid = ?";
+		String selection = "a." + AttaBaseContract.BaseSchema._ID + " = ?";
 		String[] selectionArgs = new String[] {baseId};
 		
-		return query(selection, selectionArgs, columns, AttaBaseContract.AttaBaseSchema.TABLE_SERVICE_BASE_LOC);
+		return query(selection, selectionArgs, columns, AttaBaseContract.AttaBaseSchema.TABLE_SERVICE_BASE_LOC, null, null, null);
 	}
 	public Cursor getLocation(String locId, String[] columns) {
-		String selection = "rowid = ?";
+		String selection = "c." + AttaBaseContract.LocationSchema._ID + " = ?";
 		String[] selectionArgs = new String[] {locId};
 		
-		return query(selection, selectionArgs, columns, AttaBaseContract.AttaBaseSchema.TABLE_ALL);
+		return query(selection, selectionArgs, columns, AttaBaseContract.AttaBaseSchema.TABLE_ALL, null, null, null);
 	}
 	public Cursor getService(String serviceId, String[] columns) {
 		String selection = "rowid = ?";
 		String[] selectionArgs = new String[] {serviceId};
 		
-		return query(selection, selectionArgs, columns, AttaBaseContract.ServiceSchema.TABLE_NAME);
+		return query(selection, selectionArgs, columns, AttaBaseContract.ServiceSchema.TABLE_NAME, null, null, null);
 	}
 	public Cursor getBase(String[] columns) {
-		return query(null, null, columns, AttaBaseContract.AttaBaseSchema.TABLE_SERVICE_BASE_LOC);
+		return query(null, null, columns, AttaBaseContract.AttaBaseSchema.TABLE_SERVICE_BASE_LOC, null, null, null);
 	}
+	
 	public Cursor getService(String[] columns) {
-		return query(null, null, columns, AttaBaseContract.ServiceSchema.TABLE_NAME);
+		return query(null, null, columns, AttaBaseContract.ServiceSchema.TABLE_NAME, null, null, null);
 	}
 	public Cursor getLocation(String[] columns) {
-		return query(null, null, columns, AttaBaseContract.AttaBaseSchema.TABLE_ALL);
+		return query(null, null, columns, AttaBaseContract.AttaBaseSchema.TABLE_ALL, null, null, null);
+	}
+	public Cursor getBases(String serviceId, String[] columns) {
+		return query("b." + AttaBaseContract.ServiceSchema._ID + " = ?",
+						new String[] {serviceId},
+						columns,
+						AttaBaseContract.AttaBaseSchema.TABLE_ALL, 
+						"a." + AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME, 
+						null, 
+						"a." + AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME + " COLLATE NOCASE");
+		
+		// TODO Sort correctly, so installation address is first if present
+	}
+	public Cursor getBaseAddress(String baseId, String[] columns) {
+		return query("a." + AttaBaseContract.BaseSchema._ID + " = ? AND d." + AttaBaseContract.LocationTypeSchema.COLUMN_NAME_DIRECTORY_NAME + " = ? ",
+				new String[] {baseId, AttaBaseContract.LocationTypeSchema.BASE_ADDRESS_TYPE},
+				columns,
+				AttaBaseContract.AttaBaseSchema.TABLE_ALL, 
+				null, 
+				null, 
+				null);
 	}
 	
 	// SEARCH / GET MATCHES
 	public Cursor getServiceMatches(String string, String[] columns) {
 		String selection = AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME + " MATCH ?";
 		String[] selectionArgs = new String[] {string+"*"};
-		return query(selection, selectionArgs, columns, AttaBaseContract.ServiceSchema.TABLE_NAME);
+		return query(selection, selectionArgs, columns, AttaBaseContract.ServiceSchema.TABLE_NAME, null, null, null);
 		
         /* This builds a query that looks like:
          *     SELECT <columns> FROM <table> WHERE <KEY_WORD> MATCH 'query*'
@@ -106,27 +127,28 @@ public class AttaBaseDatabase {
 	public Cursor getBaseMatches(String string, String[] columns) {
 		String selection = AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME + " MATCH ?";
 		String[] selectionArgs = new String[] {string+"*"};
-		return query(selection, selectionArgs, columns, AttaBaseContract.AttaBaseSchema.TABLE_SERVICE_BASE_LOC);
+		return query(selection, selectionArgs, columns, AttaBaseContract.AttaBaseSchema.TABLE_SERVICE_BASE_LOC, null, null, null);
 	}
 	public Cursor getLocationMatches(String string, String[] columns) {
 		String selection = AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME + " MATCH ?";
 		String[] selectionArgs = new String[] {string+"*"};
-		return query(selection, selectionArgs, columns, AttaBaseContract.AttaBaseSchema.TABLE_ALL);
+		return query(selection, selectionArgs, columns, AttaBaseContract.AttaBaseSchema.TABLE_ALL, null, null, null);
 	}
 	
 	
-	private Cursor query(String selection, String[] selectionArgs, String[] columns, String tables) {
+	private Cursor query(String selection, String[] selectionArgs, String[] columns, String tables, String groupBy, String having, String sortOrder) {
 		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
 		builder.setTables(tables);
-		builder.setProjectionMap(mColumnMap);
+		//builder.setProjectionMap(mColumnMap);
+		builder.setDistinct(true);
 		
 		Cursor cursor = builder.query(mDb, 
 										columns, 
 										selection, 
 										selectionArgs, 
-										null, 
-										null, 
-										null);
+										groupBy, 
+										having, 
+										sortOrder);
 		
 		if (cursor == null){
 			return null;
@@ -354,6 +376,9 @@ public class AttaBaseDatabase {
 
 
 	}
+
+
+
 
 
 
