@@ -1,5 +1,8 @@
 package co.bantamstudio.attabase;
 
+import java.io.IOException;
+import java.util.List;
+
 import com.actionbarsherlock.ActionBarSherlock;
 import com.actionbarsherlock.ActionBarSherlock.OnCreateOptionsMenuListener;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -7,18 +10,25 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
@@ -40,37 +50,72 @@ public class ActivityBaseList extends SherlockActivity {
 	//private LocationDbHelper mDbHelper;
 	// http://www.qubi.us/2011/09/easy-viewanimator-transition-slide.html
 	private ViewAnimator va;
-	private VIEW_TYPE mCurrentView; 
+	
 	
 	public static enum VIEW_TYPE {VIEW_SERVICES, VIEW_BASES, VIEW_BASE, VIEW_LOCATION};
-	public static enum SERVICE {AIR_FORCE, ARMY, NAVY, MARINES, DEFAULT};
-	//private int mCurrentService;
-	//private int mCurrentBase;
+	public static enum SERVICE {AIR_FORCE, ARMY, NAVY, MARINES, DEFENSE_LOGISTICS, STATE_PROGRAMS, DEFAULT};
+
 	private Service mCurrentService;
 	private Base mCurrentBase;
+	private Location mCurrentLocation;
+	private VIEW_TYPE mCurrentView; 
+	private long mCurrentIndex;
 	
 	// Animations
 	private Animation leftToMiddle = AttaBaseContract.horizontalAnimation(-1.0f, AttaBaseContract.RIGHT);
 	private Animation middleToRight = AttaBaseContract.horizontalAnimation(0.0f, AttaBaseContract.RIGHT);
 	private Animation rightToMiddle = AttaBaseContract.horizontalAnimation(+1.0f, AttaBaseContract.LEFT);
 	private Animation middleToLeft = AttaBaseContract.horizontalAnimation(0.0f, AttaBaseContract.LEFT);
-	private Location mCurrentLocation;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base_list);
-        va = (ViewAnimator)findViewById(R.id.listAnimator);
-        va.setInAnimation(rightToMiddle);
-        va.setOutAnimation(middleToLeft);
+        InitializeUI();
+    }
+    
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+        setContentView(R.layout.activity_base_list);
+
+        InitializeUI();
+    }
+    
+    private void InitializeUI(){
+    	if (va == null){
+	        va = (ViewAnimator)findViewById(R.id.listAnimator);
+	        va.setInAnimation(rightToMiddle);
+	        va.setOutAnimation(middleToLeft);
+    	}
         
-        //loadServices(findViewById(R.id.button1));
-        //mDbHelper = new LocationDbHelper(this.getApplicationContext());
-        
-        // Load set preferences
-        //SharedPreferences prefs = getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
-        //mCurrentBase = prefs.getInt(AttaBaseContract.PREFS_HOME_BASE_INT, AttaBaseContract.NO_BASE);
-        //mCurrentService = prefs.getInt(AttaBaseContract.PREFS_HOME_SERVICE_INT, AttaBaseContract.NO_BASE);
+        // Get message from intent
+        Intent intent = getIntent();
+        String message = intent.getStringExtra(AttaBaseContract.BASE_LIST_STATE);
+        try {
+        	if (message == null){
+	        	mCurrentView = VIEW_TYPE.VIEW_SERVICES;
+	        	mCurrentIndex = AttaBaseContract.NO_BASE;
+        	}
+        	else if (message.equalsIgnoreCase(AttaBaseContract.BASE_LIST_LOCATION)){
+	        	mCurrentView = VIEW_TYPE.VIEW_LOCATION;
+	        	mCurrentService = new Service(this, intent.getLongExtra(AttaBaseContract.BASE_LIST_SERVICE_INDEX, AttaBaseContract.NO_SERVICE));
+	        	mCurrentBase = new Base(this, mCurrentService, intent.getLongExtra(AttaBaseContract.BASE_LIST_BASE_INDEX, AttaBaseContract.NO_BASE));
+	        	mCurrentIndex = intent.getLongExtra(AttaBaseContract.BASE_LIST_LOCATION_INDEX, AttaBaseContract.NO_BASE);        	
+	        }else if (message.equalsIgnoreCase(AttaBaseContract.BASE_LIST_BASE)) {
+	        	mCurrentView = VIEW_TYPE.VIEW_BASE;
+	        	mCurrentService = new Service(this, intent.getLongExtra(AttaBaseContract.BASE_LIST_SERVICE_INDEX, AttaBaseContract.NO_SERVICE));
+	        	mCurrentIndex = intent.getLongExtra(AttaBaseContract.BASE_LIST_BASE_INDEX, AttaBaseContract.NO_BASE);
+	        }else {
+	        	mCurrentView = VIEW_TYPE.VIEW_SERVICES;
+	        	mCurrentIndex = AttaBaseContract.NO_BASE;
+	        }
+		} catch (Exception e) {
+			Log.d(AttaBaseContract.APP_STRING, e.getMessage());
+			mCurrentView = VIEW_TYPE.VIEW_SERVICES;
+        	mCurrentIndex = AttaBaseContract.NO_BASE;
+		}
     }
 
     @Override
@@ -78,15 +123,7 @@ public class ActivityBaseList extends SherlockActivity {
         super.onStart();  // Always call the superclass method first
         
         if (va.getChildCount() == 0){
-	        //if (mCurrentBase > 0){
-	        //	transitionToNewView(VIEW_TYPE.VIEW_BASE, mCurrentBase);
-	        //}
-	        //else if (mCurrentService > 0){
-	        //	transitionToNewView(VIEW_TYPE.VIEW_BASES, mCurrentService);
-	        //}
-	        //else {
-	        	transitionToNewView(VIEW_TYPE.VIEW_SERVICES, AttaBaseContract.NO_BASE);
-	        //}  
+        	transitionToNewView(mCurrentView, mCurrentIndex);
         }
     }
     
@@ -273,7 +310,6 @@ public class ActivityBaseList extends SherlockActivity {
 
         // LOAD LAYOUT XML    
         LinearLayout ll = (LinearLayout) View.inflate(this, R.layout.base_location_view, null);
-        
         ((TextView) ll.findViewById(R.id.baseName)).setText(loc.getLocationName());
         ((TextView) ll.findViewById(R.id.address1)).setText(loc.getLocationAddress1());
         ((TextView) ll.findViewById(R.id.address2)).setText(loc.getLocationAddress2());
@@ -291,7 +327,95 @@ public class ActivityBaseList extends SherlockActivity {
         ((TextView) ll.findViewById(R.id.website1)).setText(loc.getWebsite1());
         ((TextView) ll.findViewById(R.id.website2)).setText(loc.getWebsite2());
         ((TextView) ll.findViewById(R.id.website3)).setText(loc.getWebsite3());
-        ((TextView) ll.findViewById(R.id.zip)).setText(loc.getLocationZip());     
+        ((TextView) ll.findViewById(R.id.zip)).setText(loc.getLocationZip());
+        
+        // Website Group Visibility
+    	if (loc.getWebsite1().equalsIgnoreCase("")){
+    		((TextView)ll.findViewById(R.id.website1)).setVisibility(TextView.GONE);
+    		((LinearLayout)ll.findViewById(R.id.websiteGroup)).setVisibility(LinearLayout.GONE);
+    	}
+    	if (loc.getWebsite2().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.website2)).setVisibility(TextView.GONE);
+    	if (loc.getWebsite3().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.website3)).setVisibility(TextView.GONE);
+    	
+    	// Phone Group Visibility
+    	if (loc.getLocationPhone1().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.phone1)).setVisibility(TextView.GONE);
+    	if (loc.getLocationPhone2().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.phone2)).setVisibility(TextView.GONE);
+    	if (loc.getLocationPhone3().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.phone3)).setVisibility(TextView.GONE);
+    	if (loc.getLocationPhoneFax().equalsIgnoreCase(""))
+    		((LinearLayout)ll.findViewById(R.id.faxGroup)).setVisibility(LinearLayout.GONE);
+    	if (loc.getDsn().equalsIgnoreCase(""))
+    		((LinearLayout)ll.findViewById(R.id.dsnGroup)).setVisibility(LinearLayout.GONE);
+    	if (loc.getDsnFax().equalsIgnoreCase(""))
+    		((LinearLayout)ll.findViewById(R.id.dsnFaxGroup)).setVisibility(LinearLayout.GONE);
+    	if (loc.getLocationPhone1().equalsIgnoreCase("") && loc.getLocationPhone2().equalsIgnoreCase("") &&
+    			loc.getLocationPhone3().equalsIgnoreCase("") && loc.getLocationPhoneFax().equalsIgnoreCase("") &&
+    			loc.getDsn().equalsIgnoreCase("") && loc.getDsnFax().equalsIgnoreCase(""))
+    		((LinearLayout)ll.findViewById(R.id.phoneGroup)).setVisibility(LinearLayout.GONE);
+    	
+    	// Address Fields Visibility    	
+    	if (loc.getLocationAddress1().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.address1)).setVisibility(LinearLayout.GONE);
+    	if (loc.getLocationAddress2().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.address2)).setVisibility(LinearLayout.GONE);
+    	if (loc.getLocationAddress3().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.address3)).setVisibility(LinearLayout.GONE);
+    	if (loc.getLocationAddress4().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.address4)).setVisibility(LinearLayout.GONE);
+    	if (loc.getLocationCity().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.city)).setVisibility(LinearLayout.GONE);
+    	if (loc.getLocationState().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.state)).setVisibility(LinearLayout.GONE);
+    	if (loc.getLocationZip().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.zip)).setVisibility(LinearLayout.GONE);
+    	if (loc.getLocationCountry().equalsIgnoreCase(""))
+    		((TextView)ll.findViewById(R.id.country)).setVisibility(LinearLayout.GONE);
+    	
+    	// Make phone1-3 clickable
+    	((TextView)ll.findViewById(R.id.phone1)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				goToDialer(v);
+			}
+		});
+    	((TextView)ll.findViewById(R.id.phone2)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				goToDialer(v);
+			}
+		});
+    	((TextView)ll.findViewById(R.id.phone3)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				goToDialer(v);
+			}
+		});
+    	
+    	// Make website1-3 clickable
+    	((TextView)ll.findViewById(R.id.website1)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				goToWebsite(v);
+			}
+		});
+    	((TextView)ll.findViewById(R.id.website2)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				goToWebsite(v);
+			}
+		});
+    	((TextView)ll.findViewById(R.id.website3)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				goToWebsite(v);
+			}
+		});
+    	
+    	// Make address clickable
+    	((LinearLayout)ll.findViewById(R.id.addressGroup)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				goToMap(v, mCurrentLocation);
+			}
+		});
+    	
         return ll;
     }
     
@@ -370,6 +494,57 @@ public class ActivityBaseList extends SherlockActivity {
     		return VIEW_TYPE.VIEW_BASE;
     	default:
     		return VIEW_TYPE.VIEW_BASE;
+    	}
+    }
+    
+    public void goToDialer(View view){
+    	String number = (String) ((TextView)view).getText();
+    	Uri phoneUri = Uri.parse("tel:"+number);
+    	Intent intent = new Intent(Intent.ACTION_VIEW, phoneUri);
+    	startActivity(intent);
+    }
+    public void goToWebsite(View view){
+    	String website = (String) ((TextView)view).getText();
+    	Uri websiteUri = Uri.parse(website);
+    	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
+    	startActivity(intent);
+    }
+    @SuppressLint("NewApi")
+	public void goToMap(View view, Location loc){
+    	String address = 	loc.getLocationAddress1() +
+    						(loc.getLocationAddress2().equalsIgnoreCase("")?"":(", "+loc.getLocationAddress2())) +
+    						(loc.getLocationAddress3().equalsIgnoreCase("")?"":(", "+loc.getLocationAddress3())) +
+    						(loc.getLocationAddress4().equalsIgnoreCase("")?"":(", "+loc.getLocationAddress4())) +
+    						(loc.getLocationCity().equalsIgnoreCase("")?"":(", "+loc.getLocationCity())) +
+    						(loc.getLocationState().equalsIgnoreCase("")?"":(", "+loc.getLocationState())) +
+    						(loc.getLocationZip().equalsIgnoreCase("")?"":(" "+loc.getLocationZip())) +
+    						(loc.getLocationCountry().equalsIgnoreCase("")?"":(", "+loc.getLocationCountry()));
+    	String addressLabel = loc.getBase().getBaseString() + " " + loc.getLocationName();
+    	
+    	Uri locationUri = null;
+    	boolean useSimpleLocation = true;
+    	
+    	if (Build.VERSION.SDK_INT >= 9 && Geocoder.isPresent()){
+    		useSimpleLocation = false;
+    		Geocoder gc = new Geocoder(this);
+    		List<Address> al = null;
+			try {
+				al = gc.getFromLocationName(address, 1);
+	    		double lat = al.get(0).getLatitude();
+	    		double lon = al.get(0).getLongitude();
+	    		locationUri = Uri.parse("geo:"+lat+","+lon+"?z=1");
+			} catch (IOException e) {
+				Log.d(AttaBaseContract.APP_STRING, e.getMessage());
+				useSimpleLocation = true;
+			}
+    	}
+    	
+    	if (useSimpleLocation)    	
+    		locationUri = Uri.parse("geo:0,0?q="+address+"("+addressLabel+")");
+				
+    	if (locationUri != null){
+    		Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
+        	startActivity(intent);
     	}
     }
 }

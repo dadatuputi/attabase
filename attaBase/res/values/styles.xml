@@ -31,5 +31,8 @@
         <item name="android:layout_alignParentBottom">true</item>
         <item name="android:layout_marginBottom">10dip</item>
     </style>
+    <style name="LocationItem" parent="AppTheme">
+        <item name="android:layout_marginLeft">5dip</item>
+    </style>
 
 </resources>

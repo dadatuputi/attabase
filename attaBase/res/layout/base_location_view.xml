@@ -31,6 +31,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/addressGroup"
             style="@style/LocationGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -59,6 +60,7 @@
 
                     <TextView
                         android:id="@+id/address1"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Small Text"
@@ -66,6 +68,7 @@
 
                     <TextView
                         android:id="@+id/address2"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Small Text"
@@ -73,6 +76,7 @@
 
                     <TextView
                         android:id="@+id/address3"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Small Text"
@@ -80,6 +84,7 @@
 
                     <TextView
                         android:id="@+id/address4"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Small Text"
@@ -91,6 +96,7 @@
 
                         <TextView
                             android:id="@+id/city"
+                            style="@style/LocationItem"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Small Text"
@@ -98,6 +104,7 @@
 
                         <TextView
                             android:id="@+id/state"
+                            style="@style/LocationItem"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Small Text"
@@ -105,6 +112,7 @@
 
                         <TextView
                             android:id="@+id/zip"
+                            style="@style/LocationItem"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Small Text"
@@ -113,6 +121,7 @@
 
                     <TextView
                         android:id="@+id/country"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Small Text"
@@ -122,6 +131,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/phoneGroup"
             style="@style/LocationGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -150,51 +160,108 @@
 
                     <TextView
                         android:id="@+id/phone1"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Small Text"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                        android:textSize="20sp"
+                        android:onClick="goToDialer" />
 
                     <TextView
                         android:id="@+id/phone2"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Small Text"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="20sp"
+                        android:onClick="goToDialer" />
 
                     <TextView
                         android:id="@+id/phone3"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Small Text"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="20sp"
+                        android:onClick="goToDialer" />
 
-                    <TextView
-                        android:id="@+id/fax"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Small Text"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                    <LinearLayout
+                        android:id="@+id/faxGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
 
-                    <TextView
-                        android:id="@+id/dsn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Small Text"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                        <TextView
+                            android:id="@+id/textView1"
+                            style="@style/LocationItem"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/fax"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                    <TextView
-                        android:id="@+id/dsn_fax"
+                        <TextView
+                            android:id="@+id/fax"
+                            style="@style/LocationItem"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Small Text"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/dsnGroup"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Small Text"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                        android:layout_height="wrap_content" >
+
+                        <TextView
+                            android:id="@+id/TextView01"
+                            style="@style/LocationItem"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dsn"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                        <TextView
+                            android:id="@+id/dsn"
+                            style="@style/LocationItem"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Small Text"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/dsnFaxGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
+                        <TextView
+                            android:id="@+id/TextView04"
+                            style="@style/LocationItem"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dsn_fax"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                        <TextView
+                            android:id="@+id/dsn_fax"
+                            style="@style/LocationItem"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Small Text"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/websiteGroup"
             style="@style/LocationGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -218,11 +285,12 @@
 
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical" >
 
                     <TextView
                         android:id="@+id/website1"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Small Text"
@@ -230,6 +298,7 @@
 
                     <TextView
                         android:id="@+id/website2"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Small Text"
@@ -237,6 +306,7 @@
 
                     <TextView
                         android:id="@+id/website3"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Small Text"

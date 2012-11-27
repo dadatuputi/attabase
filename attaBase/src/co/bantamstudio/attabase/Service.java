@@ -53,6 +53,14 @@ public class Service {
 			this.service = SERVICE.AIR_FORCE;
 			serviceSymbol = R.drawable.af_symbol;
 			break;
+		case 5:
+			this.service = SERVICE.DEFENSE_LOGISTICS;
+			serviceSymbol = 0;
+			break;
+		case 6:
+			this.service = SERVICE.STATE_PROGRAMS;
+			serviceSymbol = 0;
+			break;
 		default:
 			break;
 		}

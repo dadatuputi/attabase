@@ -18,8 +18,14 @@ public class AttaBaseContract {
 	public static final String APP_STRING = "co.bantamstudio.attabase";
 	public static final String APP_STRING_VND = "vnd.bantamstudio.attabase";
 	public static final String BASE_LIST_STATE = APP_STRING+"_base_list_state";
+	public static final String BASE_LIST_BASE_INDEX = APP_STRING+"_base_list_base_index";
+	public static final String BASE_LIST_SERVICE_INDEX = APP_STRING+"_base_list_service_index";
+	public static final String BASE_LIST_LOCATION_INDEX = APP_STRING+"_base_list_location_index";
+	
 	// STATES TO PASS TO BASE LIST
 	public static final String BASE_LIST_BASE = "base_list_base";
+	public static final String BASE_LIST_LOCATION = "base_list_location";
+	
 	
 	// PREFERENCES
 	public static final String PREFS_IMPORTED_BOOL = "importedBool";
