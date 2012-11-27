@@ -3,7 +3,8 @@
     package="co.bantamstudio.attabase"
     android:versionCode="1"
     android:versionName="1.0"
-    android:installLocation="auto" >
+    android:installLocation="auto"
+     >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -23,13 +24,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="co.bantamstudio.attabase.ActivityDisplayMessage"
-            android:label="@string/title_activity_display_message" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="co.bantamstudio.attabase.MainActivity" />
-        </activity>
-        <activity
             android:name="co.bantamstudio.attabase.ActivityImportCSV"
             android:label="@string/title_activity_show_all_entries" >
             <meta-data
@@ -37,28 +31,8 @@
                 android:value="co.bantamstudio.attabase.MainActivity" />
         </activity>
         <activity
-            android:name="co.bantamstudio.attabase.BaseListActivity"
-            android:label="@string/title_base_list" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="co.bantamstudio.attabase.ActivityMain" />
-        </activity>
-        <activity
-            android:name="co.bantamstudio.attabase.BaseDetailActivity"
-            android:label="@string/title_base_detail" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".BaseListActivity" />
-        </activity>
-        <activity
-            android:name="co.bantamstudio.attabase.ActivityBaseViewer"
-            android:label="@string/title_activity_activity_base_viewer" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name="co.bantamstudio.attabase.ActivityBaseList"
+            android:configChanges="orientation|keyboardHidden"
             android:label="@string/title_activity_activity_home" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -66,6 +40,7 @@
         </activity>
         <activity
             android:name="co.bantamstudio.attabase.ActivityWizard"
+            android:configChanges="orientation|keyboardHidden"
             android:label="@string/title_activity_activity_wizard" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

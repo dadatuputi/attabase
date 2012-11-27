@@ -1,11 +1,15 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical" >
 
         <TextView
@@ -24,32 +28,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dip"
+            android:layout_marginBottom="20dp"
             android:orientation="vertical" >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="bottom" >
+                android:gravity="bottom"
+                android:onClick="goToBase" >
 
                 <ImageView
                     android:id="@+id/baseImage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:contentDescription="Home Button"
                     android:src="@drawable/ic_menu_home" />
 
                 <TextView
                     android:id="@+id/baseName"
+                    style="@style/LocationItem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/home_base"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
+
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/LocationGroup"
-                android:orientation="vertical" >
+                android:orientation="vertical"
+                android:onClick="goToMap" >
 
                 <TextView
                     android:id="@+id/textView3"
@@ -65,6 +75,7 @@
                         android:id="@+id/imageView3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:contentDescription="Maps Button"
                         android:src="@drawable/ic_menu_directions" />
 
                     <LinearLayout
@@ -74,23 +85,23 @@
 
                         <TextView
                             android:id="@+id/address1"
+                            style="@style/LocationItem"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Small Text"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         <TextView
                             android:id="@+id/address2"
+                            style="@style/LocationItem"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Small Text"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         <TextView
                             android:id="@+id/address3"
+                            style="@style/LocationItem"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Small Text"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         <LinearLayout
@@ -99,41 +110,43 @@
 
                             <TextView
                                 android:id="@+id/city"
+                                style="@style/LocationItem"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Small Text"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                             <TextView
                                 android:id="@+id/state"
+                                style="@style/LocationItem"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Small Text"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                             <TextView
                                 android:id="@+id/zip"
+                                style="@style/LocationItem"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Small Text"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
                         </LinearLayout>
 
                         <TextView
                             android:id="@+id/country"
+                            style="@style/LocationItem"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Small Text"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/phoneGroup"
+                style="@style/LocationGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                style="@style/LocationGroup" >
+                android:onClick="goToDialer" >
 
                 <TextView
                     android:id="@+id/textView5"
@@ -149,22 +162,25 @@
                         android:id="@+id/imageView2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:contentDescription="Phone Button"
                         android:src="@drawable/ic_menu_call" />
 
                     <TextView
                         android:id="@+id/phone"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Small Text"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
                 </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/websiteGroup"
+                style="@style/LocationGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                style="@style/LocationGroup" >
+                android:onClick="goToWebsite" >
 
                 <TextView
                     android:id="@+id/TextView02"
@@ -180,30 +196,31 @@
                         android:id="@+id/ImageView01"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:contentDescription="Compass Button"
                         android:src="@drawable/ic_menu_compass" />
 
                     <TextView
                         android:id="@+id/website"
+                        style="@style/LocationItem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Small Text"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
+        <RelativeLayout
+            style="@style/BottomRelativeLayout"
+            android:layout_width="match_parent" >
+
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:onClick="buttonBrowse"
+                android:text="@string/browse_all_locations" />
+        </RelativeLayout>
+
     </LinearLayout>
-
-    <RelativeLayout
-        style="@style/BottomRelativeLayout" >
-
-        <Button
-            android:id="@+id/button1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/browse_all_locations"
-            android:onClick="buttonBrowse" />
-
-    </RelativeLayout>
-
-</RelativeLayout> 
+ </ScrollView>
+</LinearLayout> 
