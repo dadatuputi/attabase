@@ -1,57 +1,28 @@
 package co.bantamstudio.attabase;
 
-import java.util.HashMap;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
-import android.provider.BaseColumns;
 
 public class AttaBaseDatabase {
 	
 	private final LocationDbHelper mDbHelper;
 	private SQLiteDatabase mDb;
 	
-	private static final HashMap<String,String> mColumnMap = buildColumnMap();
-	
 	public AttaBaseDatabase(Context context) {
 		mDbHelper = new LocationDbHelper(context);
 		mDb = mDbHelper.getReadableDatabase();
 	}
 	
-	private static HashMap<String, String> buildColumnMap() {
-		HashMap<String,String> map = new HashMap<String,String>();
-		map.put(BaseColumns._ID, BaseColumns._ID);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME, AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION, AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION);
-		map.put(AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME, AttaBaseContract.ServiceSchema.COLUMN_NAME_SERVICE_NAME);
-		map.put(AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME, AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS1, AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS1);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS2, AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS2);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS3, AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS3);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS4, AttaBaseContract.LocationSchema.COLUMN_NAME_ADDRESS4);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_CITY, AttaBaseContract.LocationSchema.COLUMN_NAME_CITY);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_STATE, AttaBaseContract.LocationSchema.COLUMN_NAME_STATE);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_ZIP_CODE, AttaBaseContract.LocationSchema.COLUMN_NAME_ZIP_CODE);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_COUNTRY, AttaBaseContract.LocationSchema.COLUMN_NAME_COUNTRY);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE1, AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE1);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE2, AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE2);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE3, AttaBaseContract.LocationSchema.COLUMN_NAME_PHONE3);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_FAX, AttaBaseContract.LocationSchema.COLUMN_NAME_FAX);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_DSN, AttaBaseContract.LocationSchema.COLUMN_NAME_DSN);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_DSN_FAX, AttaBaseContract.LocationSchema.COLUMN_NAME_DSN_FAX);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE1, AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE1);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE2, AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE2);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE3, AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE3);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_BASE, AttaBaseContract.LocationSchema.COLUMN_NAME_BASE);
-		map.put(AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_TYPE, AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_TYPE);
-		return map;
-	}
-
 	public SQLiteDatabase getReadableDb() {
 		return mDb;
+	}
+	
+	public void close(){
+		if (mDbHelper != null)
+			mDbHelper.close();
 	}
 
 	// GET OBJECTS

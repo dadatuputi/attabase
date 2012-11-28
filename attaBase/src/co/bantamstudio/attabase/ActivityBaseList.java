@@ -1,53 +1,31 @@
 package co.bantamstudio.attabase;
 
-import java.io.IOException;
-import java.util.List;
-
 import com.actionbarsherlock.ActionBarSherlock;
-import com.actionbarsherlock.ActionBarSherlock.OnCreateOptionsMenuListener;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.FilterQueryProvider;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewAnimator;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 
 public class ActivityBaseList extends SherlockActivity {
 	ActionBarSherlock mSherlock = ActionBarSherlock.wrap(this);
-	//private Set<Cursor> cursors;
-	//private SimpleCursorAdapter mAdapter;
-	//private LocationDbHelper mDbHelper;
 	// http://www.qubi.us/2011/09/easy-viewanimator-transition-slide.html
 	private ViewAnimator va;
 	
@@ -60,34 +38,27 @@ public class ActivityBaseList extends SherlockActivity {
 	private Location mCurrentLocation;
 	private VIEW_TYPE mCurrentView; 
 	private long mCurrentIndex;
+	private MenuItem mMenuItem;
 	
 	// Animations
 	private Animation leftToMiddle = AttaBaseContract.horizontalAnimation(-1.0f, AttaBaseContract.RIGHT);
 	private Animation middleToRight = AttaBaseContract.horizontalAnimation(0.0f, AttaBaseContract.RIGHT);
 	private Animation rightToMiddle = AttaBaseContract.horizontalAnimation(+1.0f, AttaBaseContract.LEFT);
 	private Animation middleToLeft = AttaBaseContract.horizontalAnimation(0.0f, AttaBaseContract.LEFT);
+	private Animation noAnimation = AttaBaseContract.noAnimation();
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	setTheme(R.style.Theme_Sherlock_Light);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base_list);
-        InitializeUI();
+        InitializeUI(false);
     }
-    
-    @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
-        super.onConfigurationChanged(newConfig);
-        setContentView(R.layout.activity_base_list);
-
-        InitializeUI();
-    }
-    
-    private void InitializeUI(){
+      
+    private void InitializeUI(boolean animate){
     	if (va == null){
 	        va = (ViewAnimator)findViewById(R.id.listAnimator);
-	        va.setInAnimation(rightToMiddle);
-	        va.setOutAnimation(middleToLeft);
+	        setAnimation(true);
     	}
         
         // Get message from intent
@@ -123,50 +94,109 @@ public class ActivityBaseList extends SherlockActivity {
         super.onStart();  // Always call the superclass method first
         
         if (va.getChildCount() == 0){
-        	transitionToNewView(mCurrentView, mCurrentIndex);
+        	transitionToNewView(mCurrentView, mCurrentIndex, false);
         }
     }
     
-//    @Override
-//    public boolean onCreateOptionsMenu(android.view.Menu menu) {
-//        return mSherlock.dispatchCreateOptionsMenu(menu);
-//    }
-    
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
-        //boolean isLight = SampleList.THEME == R.style.Theme_Sherlock_Light;
-
-        menu.add("Save")
-            .setIcon(R.drawable.ic_input_get)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-
-        menu.add("Search")
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-
-        menu.add("Refresh")
-            .setIcon(R.drawable.ic_dialog_map)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-
-        return true;
-//        MenuItem miExample1 = menu.add("Example1");
-//        miExample1.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-//         
-//        MenuItem miDismiss = menu.add("Dismiss");
-//        miDismiss.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-//         
-//        miDismiss.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-//            public boolean onMenuItemClick(MenuItem item) {
-// 
-//                finish();
-// 
-//                return true;
-//            }
-//     
-//        });
-//         
-//        return true;
+    	
+    	ActionBar bar = getSupportActionBar();
+    	bar.setDisplayOptions(
+                ActionBar.DISPLAY_HOME_AS_UP |
+                ActionBar.DISPLAY_SHOW_CUSTOM |
+                ActionBar.DISPLAY_SHOW_HOME |
+                ActionBar.DISPLAY_SHOW_TITLE |
+                ActionBar.DISPLAY_USE_LOGO);
+           	
+    	mMenuItem = menu.add("Change your home base");
+    	mMenuItem.setIcon(R.drawable.ic_menu_myplaces);
+    	mMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+    	
+    	MenuItem donateMenu = menu.add("Donate");
+    	donateMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+    	donateMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			public boolean onMenuItemClick(MenuItem item) {
+		    	Uri websiteUri = Uri.parse(AttaBaseContract.PAYPAL_DONATE);
+		    	// GA
+		    	AttaBaseContract.gaTracker.trackPageView("Donate");
+		    	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
+		    	startActivity(intent);
+				return true;
+			}
+		});
+    	// CREATE FEEDBACK MENU
+    	MenuItem feedBackMenu = menu.add("Feedback");
+    	feedBackMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+    	feedBackMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			public boolean onMenuItemClick(MenuItem item) {
+		    	Uri websiteUri = Uri.parse(AttaBaseContract.FEEDBACK_LINK);
+		    	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
+		    	AttaBaseContract.gaTracker.trackPageView("Feedback");
+		    	startActivity(intent);
+				return true;
+			}
+		});
+    	setupBookmark();
+    	return super.onCreateOptionsMenu(menu);
     }
     
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	case android.R.id.home:
+    		finish();
+    	default:
+    		return super.onOptionsItemSelected(item);
+    	}
+    }
+    
+    private boolean setupBookmark(){
+    	if (mMenuItem != null) {
+			switch (mCurrentView) {
+			case VIEW_BASE:
+				mMenuItem.setVisible(true);
+				mMenuItem.setEnabled(true);
+				mMenuItem
+						.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+							public boolean onMenuItemClick(MenuItem item) {
+					    		AttaBaseContract.setHomeBase(getBaseContext(), mCurrentBase.getBaseIndex());
+								Toast toast = Toast.makeText(
+										getApplicationContext(),
+										"Home base set to "
+												+ mCurrentBase.getBaseString(),
+										Toast.LENGTH_LONG);
+								toast.show();
+								return true;
+							}
+						});
+				break;
+			case VIEW_BASES:
+				mMenuItem.setVisible(true);
+				mMenuItem.setEnabled(true);
+				mMenuItem
+						.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+							public boolean onMenuItemClick(MenuItem item) {
+								AttaBaseContract.setHomeService(getBaseContext(), mCurrentService.getServiceIndex());
+								Toast toast = Toast.makeText(
+										getApplicationContext(),
+										"Home service set to "
+												+ mCurrentService
+														.getServiceString(),
+										Toast.LENGTH_LONG);
+								toast.show();
+								return true;
+							}
+						});
+				break;
+			default:
+				mMenuItem.setVisible(false);
+		    	mMenuItem.setEnabled(false);
+		    	return false;
+			}
+		}
+    	return true;
+    }
   
     @Override
     public void onBackPressed() {
@@ -180,9 +210,65 @@ public class ActivityBaseList extends SherlockActivity {
            va.setInAnimation(rightToMiddle);
            va.setOutAnimation(middleToLeft);
     	   mCurrentView = getPreviousViewType(mCurrentView);
+   			setupBookmark();
        }      
        else
     	   super.onBackPressed();
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+      super.onSaveInstanceState(savedInstanceState);
+      // Save UI state changes to the savedInstanceState.
+      // This bundle will be passed to onCreate if the process is
+      // killed and restarted.
+      String temp_view_state = mCurrentView.toString();
+      Long temp_base = (mCurrentBase!=null)?mCurrentBase.getBaseIndex():AttaBaseContract.NO_BASE;
+      Long temp_service = (mCurrentService!=null)?mCurrentService.getServiceIndex():AttaBaseContract.NO_SERVICE;
+      Long temp_location = (mCurrentLocation!=null)?mCurrentLocation.getLocIndex():AttaBaseContract.NO_BASE;
+      savedInstanceState.putString("VIEW_STATE", temp_view_state);
+      savedInstanceState.putLong("BASE", temp_base);
+      savedInstanceState.putLong("SERVICE", temp_service);
+      savedInstanceState.putLong("LOCATION", temp_location);
+    }
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+      super.onRestoreInstanceState(savedInstanceState);
+      // Restore UI state from the savedInstanceState.
+      // This bundle has also been passed to onCreate.
+      String temp_view_state = savedInstanceState.getString("VIEW_STATE");
+      Long temp_base = savedInstanceState.getLong("BASE");
+      Long temp_service = savedInstanceState.getLong("SERVICE");
+      Long temp_location = savedInstanceState.getLong("LOCATION");
+
+      VIEW_TYPE tempVt;
+      if (temp_view_state.equalsIgnoreCase("VIEW_SERVICES"))
+    	  tempVt = VIEW_TYPE.VIEW_SERVICES;
+      else if (temp_view_state.equalsIgnoreCase("VIEW_BASES"))
+    	  tempVt = VIEW_TYPE.VIEW_BASES;
+      else if (temp_view_state.equalsIgnoreCase("VIEW_BASE"))
+    	  tempVt = VIEW_TYPE.VIEW_BASE;
+      else
+    	  tempVt = VIEW_TYPE.VIEW_LOCATION;
+
+      switch (tempVt) {
+		case VIEW_SERVICES:
+			break;
+		case VIEW_BASES:
+			transitionToNewView(tempVt, temp_service, false);
+			break;
+		case VIEW_BASE:
+			transitionToNewView(VIEW_TYPE.VIEW_BASES, temp_service, false);
+			transitionToNewView(tempVt, temp_base, false);
+			break;
+		case VIEW_LOCATION:
+			transitionToNewView(VIEW_TYPE.VIEW_BASES, temp_service, false);
+			transitionToNewView(VIEW_TYPE.VIEW_BASE, temp_base, false);
+			transitionToNewView(VIEW_TYPE.VIEW_LOCATION, temp_location, false);
+			break;
+		default:
+			break;
+		}
     }
     
     @SuppressWarnings("deprecation")
@@ -224,6 +310,7 @@ public class ActivityBaseList extends SherlockActivity {
         LinearLayout ll = (LinearLayout) View.inflate(this, R.layout.base_list_view, null);
         
         // INITIALIZE THE HEADER
+        // TODO Better breadcrumbs - issue #4 https://bitbucket.org/elBradford/attabase/issue/4/better-breadcrumbs-and-better-list-view
         LinearLayout headerLl = (LinearLayout) ll.findViewById(R.id.baseInformation);
         Header header;
 		try {
@@ -247,14 +334,15 @@ public class ActivityBaseList extends SherlockActivity {
 						long arg3) {
 					//Toast.makeText(getApplicationContext(),
 					//		((TextView)((arg1).findViewById(R.id.name_entry))).getText(), Toast.LENGTH_SHORT).show();
-					transitionToNewView(getNextViewType(mCurrentView), arg3);
+					transitionToNewView(getNextViewType(mCurrentView), arg3, true);
 				}
 			});
 	        // POPULATE THE LIST WITH LOCATIONS
 	        locations.setAdapter(adapter);
         }
         
-        // SET UP FILTER
+        // TODO SET UP FILTER
+        // 
 //        mAdapter.setFilterQueryProvider(new FilterQueryProvider(){
 //
 //			@SuppressWarnings("deprecation")
@@ -285,13 +373,13 @@ public class ActivityBaseList extends SherlockActivity {
 //        et.addTextChangedListener(new TextWatcher(){
 //
 //			public void afterTextChanged(Editable s) {
-//				// TODO Auto-generated method stub
+//				
 //				
 //			}
 //
 //			public void beforeTextChanged(CharSequence s, int start, int count,
 //					int after) {
-//				// TODO Auto-generated method stub
+//				
 //				
 //			}
 //
@@ -419,14 +507,32 @@ public class ActivityBaseList extends SherlockActivity {
         return ll;
     }
     
-	private void transitionToNewView(VIEW_TYPE vt, long index){
+    private boolean setAnimation(boolean animate){
+    	if (va!=null){
+	    	if (animate){
+    	        va.setInAnimation(rightToMiddle);
+    	        va.setOutAnimation(middleToLeft);
+    		}
+	    	else {
+	    		va.setInAnimation(noAnimation);
+	    		va.setOutAnimation(noAnimation);
+	    	}
+	    	return true;
+    	}
+    	else 
+			return false;
+    }
+    
+	private void transitionToNewView(VIEW_TYPE vt, long index, boolean animate){
     	LinearLayout ll;
     	mCurrentView = vt;
+    	setAnimation(animate);
     	
     	switch (vt) {
     	case VIEW_SERVICES:
     		mCurrentService = null;
     		mCurrentBase = null;
+    		setupBookmark();
         	ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
@@ -438,6 +544,7 @@ public class ActivityBaseList extends SherlockActivity {
 				Log.d("Exception", e1.getMessage());
 			};
     		mCurrentBase = null;
+    		setupBookmark();
         	ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
@@ -448,6 +555,7 @@ public class ActivityBaseList extends SherlockActivity {
 			} catch (Exception e) {
 				Log.d("Exception", e.getMessage());
 			}
+    		setupBookmark();
     		ll = populateBaseListView(mCurrentService, mCurrentBase);
         	va.addView(ll);
         	va.showNext();
@@ -458,6 +566,7 @@ public class ActivityBaseList extends SherlockActivity {
 			} catch (Exception e) {
 				Log.d("Exception", e.getMessage());
 			}
+    		setupBookmark();
     		ll = populateBaseLocationView(mCurrentLocation);
     		va.addView(ll);
         	va.showNext();
@@ -501,50 +610,34 @@ public class ActivityBaseList extends SherlockActivity {
     	String number = (String) ((TextView)view).getText();
     	Uri phoneUri = Uri.parse("tel:"+number);
     	Intent intent = new Intent(Intent.ACTION_VIEW, phoneUri);
+    	AttaBaseContract.gaTracker.trackEvent("Dialer", "Location", number, (int) mCurrentLocation.getLocIndex());
     	startActivity(intent);
     }
     public void goToWebsite(View view){
     	String website = (String) ((TextView)view).getText();
     	Uri websiteUri = Uri.parse(website);
     	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
+    	AttaBaseContract.gaTracker.trackEvent("External URL", "Location", website, (int) mCurrentLocation.getLocIndex());
     	startActivity(intent);
     }
-    @SuppressLint("NewApi")
 	public void goToMap(View view, Location loc){
-    	String address = 	loc.getLocationAddress1() +
-    						(loc.getLocationAddress2().equalsIgnoreCase("")?"":(", "+loc.getLocationAddress2())) +
-    						(loc.getLocationAddress3().equalsIgnoreCase("")?"":(", "+loc.getLocationAddress3())) +
-    						(loc.getLocationAddress4().equalsIgnoreCase("")?"":(", "+loc.getLocationAddress4())) +
-    						(loc.getLocationCity().equalsIgnoreCase("")?"":(", "+loc.getLocationCity())) +
-    						(loc.getLocationState().equalsIgnoreCase("")?"":(", "+loc.getLocationState())) +
-    						(loc.getLocationZip().equalsIgnoreCase("")?"":(" "+loc.getLocationZip())) +
-    						(loc.getLocationCountry().equalsIgnoreCase("")?"":(", "+loc.getLocationCountry()));
-    	String addressLabel = loc.getBase().getBaseString() + " " + loc.getLocationName();
-    	
-    	Uri locationUri = null;
-    	boolean useSimpleLocation = true;
-    	
-    	if (Build.VERSION.SDK_INT >= 9 && Geocoder.isPresent()){
-    		useSimpleLocation = false;
-    		Geocoder gc = new Geocoder(this);
-    		List<Address> al = null;
-			try {
-				al = gc.getFromLocationName(address, 1);
-	    		double lat = al.get(0).getLatitude();
-	    		double lon = al.get(0).getLongitude();
-	    		locationUri = Uri.parse("geo:"+lat+","+lon+"?z=1");
-			} catch (IOException e) {
-				Log.d(AttaBaseContract.APP_STRING, e.getMessage());
-				useSimpleLocation = true;
-			}
-    	}
-    	
-    	if (useSimpleLocation)    	
-    		locationUri = Uri.parse("geo:0,0?q="+address+"("+addressLabel+")");
-				
-    	if (locationUri != null){
-    		Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
-        	startActivity(intent);
+    	try {
+			String address = 	loc.getLocationAddress1() +
+	    						(loc.getLocationAddress2().equalsIgnoreCase("")?"":(", "+loc.getLocationAddress2())) +
+	    						(loc.getLocationAddress3().equalsIgnoreCase("")?"":(", "+loc.getLocationAddress3())) +
+	    						(loc.getLocationAddress4().equalsIgnoreCase("")?"":(", "+loc.getLocationAddress4())) +
+	    						(loc.getLocationCity().equalsIgnoreCase("")?"":(", "+loc.getLocationCity())) +
+	    						(loc.getLocationState().equalsIgnoreCase("")?"":(", "+loc.getLocationState())) +
+	    						(loc.getLocationZip().equalsIgnoreCase("")?"":(" "+loc.getLocationZip())) +
+	    						(loc.getLocationCountry().equalsIgnoreCase("")?"":(", "+loc.getLocationCountry()));
+	    	String addressLabel = loc.getBase().getBaseString() + " " + loc.getLocationName();
+	    	
+	    	Uri locationUri = Uri.parse("geo:0,0?q="+address+"("+addressLabel+")");
+			Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
+			AttaBaseContract.gaTracker.trackEvent("Map", "Location", addressLabel + " " + address, (int) mCurrentLocation.getLocIndex());
+	    	startActivity(intent);
+    	} catch (ActivityNotFoundException e) {
+    		Log.d(AttaBaseContract.APP_STRING, e.getMessage());
     	}
     }
 }

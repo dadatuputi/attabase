@@ -15,7 +15,7 @@ public class Header {
 	private int textColor1 = Color.BLACK;
 	private int textColor2 = Color.BLACK;
 	private int backgroundColor = Color.WHITE;
-	private long text1Size = 24;
+	private long text1Size = 22;
 	private long text2Size = 12;
 	
 	public Header(VIEW_TYPE viewType, LinearLayout ll, Service service, Base base) throws Exception {
