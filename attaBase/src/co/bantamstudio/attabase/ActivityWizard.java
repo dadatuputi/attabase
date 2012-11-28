@@ -2,12 +2,15 @@ package co.bantamstudio.attabase;
 
 import co.bantamstudio.attabase.ActivityBaseList.VIEW_TYPE;
 import com.actionbarsherlock.ActionBarSherlock;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
 import android.view.View;
@@ -26,7 +29,6 @@ public class ActivityWizard extends SherlockActivity {
 	//private LocationDbHelper mDbHelper;
 	// http://www.qubi.us/2011/09/easy-viewanimator-transition-slide.html
 	private ViewAnimator va;
-	private SharedPreferences prefs;
 	
 	private static enum STEP {STEP_1, STEP_1_CHOOSE, STEP_2, STEP_2_CHOOSE, STEP_3};
 	private STEP mCurrentStep = STEP.STEP_1;
@@ -41,19 +43,13 @@ public class ActivityWizard extends SherlockActivity {
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	setTheme(R.style.Theme_Sherlock_Light);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wizard_list);
 
         va = (ViewAnimator)findViewById(R.id.listAnimator);
         va.setInAnimation(rightToMiddle);
         va.setOutAnimation(middleToLeft);
-        
-        //mDbHelper = new LocationDbHelper(this.getApplicationContext());
-        
-        // Load set preferences
-        prefs = getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
-        
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
     }
     
     @Override
@@ -82,10 +78,28 @@ public class ActivityWizard extends SherlockActivity {
     	   super.onBackPressed();
     }
 
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.activity_wizard, menu);
-//        return true;
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+    	ActionBar bar = getSupportActionBar();
+    	bar.setDisplayOptions(
+                ActionBar.DISPLAY_SHOW_CUSTOM |
+                ActionBar.DISPLAY_SHOW_HOME |
+                ActionBar.DISPLAY_SHOW_TITLE |
+                ActionBar.DISPLAY_USE_LOGO);
+    	// CREATE FEEDBACK MENU
+    	MenuItem feedBackMenu = menu.add("Feedback");
+    	feedBackMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+    	feedBackMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			public boolean onMenuItemClick(MenuItem item) {
+		    	Uri websiteUri = Uri.parse(AttaBaseContract.FEEDBACK_LINK);
+		    	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
+		    	AttaBaseContract.gaTracker.trackPageView("Feedback");
+		    	startActivity(intent);
+				return true;
+			}
+		});
+    	return super.onCreateOptionsMenu(menu);
+    }
 
     
 //    @Override
@@ -241,12 +255,9 @@ public class ActivityWizard extends SherlockActivity {
     	if (mCurrentStep != STEP.STEP_3)
     		transitionToNewView(getNextStep(mCurrentStep), AttaBaseContract.NO_BASE);
     	else {
-        	SharedPreferences.Editor editor = prefs.edit();
-        	editor.putLong(AttaBaseContract.PREFS_HOME_SERVICE_INT, mCurrentService);
-        	editor.putLong(AttaBaseContract.PREFS_HOME_BASE_INT, mCurrentBase);
-        	editor.commit();
-        	
-        	finish();
+    		AttaBaseContract.setHomeBase(getBaseContext(), mCurrentBase);
+    		AttaBaseContract.setHomeService(getBaseContext(), mCurrentService);
+    		finish();
     	}
     }
 

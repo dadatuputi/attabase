@@ -1,8 +1,13 @@
 package co.bantamstudio.attabase;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import android.app.SearchManager;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.provider.BaseColumns;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 
@@ -14,7 +19,8 @@ public class AttaBaseContract {
 	public static final int NO_BASE = -1;
 	public static final int NO_SERVICE = -1;
 	
-	public static final String IMPORT_SOURCE_CSV = "attaBase.csv"; 
+	//public static final String IMPORT_SOURCE_CSV = "attaBase.csv";
+	public static final String IMPORT_SOURCE_ZIP = "attaBase.zip"; 
 	public static final String APP_STRING = "co.bantamstudio.attabase";
 	public static final String APP_STRING_VND = "vnd.bantamstudio.attabase";
 	public static final String BASE_LIST_STATE = APP_STRING+"_base_list_state";
@@ -26,6 +32,15 @@ public class AttaBaseContract {
 	public static final String BASE_LIST_BASE = "base_list_base";
 	public static final String BASE_LIST_LOCATION = "base_list_location";
 	
+	// PAYPAL
+	public static final String PAYPAL_DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TJSPTZXU5S6HQ";
+	
+	// FEEDBACK
+	public static final String FEEDBACK_LINK = "http://bantamstudio.co/form/attabase";
+	
+	// GOOGLE ANALYTICS
+	public static GoogleAnalyticsTracker gaTracker = GoogleAnalyticsTracker.getInstance();
+	public static final String gaID = "UA-36628334-1";
 	
 	// PREFERENCES
 	public static final String PREFS_IMPORTED_BOOL = "importedBool";
@@ -37,6 +52,22 @@ public class AttaBaseContract {
 	public static final int TOTAL_ROWS = 16000;
 	
 	private AttaBaseContract() {}
+	
+	public static void setHomeBase(Context context, long baseId){
+		SharedPreferences prefs = context.getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
+    	SharedPreferences.Editor editor = prefs.edit();
+    	editor.putLong(AttaBaseContract.PREFS_HOME_BASE_INT, baseId);
+    	editor.commit();
+    	AttaBaseContract.gaTracker.trackEvent("Set Home Base", "", "", (int) baseId);
+	}
+	public static void setHomeService(Context context, long serviceId){
+		SharedPreferences prefs = context.getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
+    	SharedPreferences.Editor editor = prefs.edit();
+    	editor.putLong(AttaBaseContract.PREFS_HOME_SERVICE_INT, serviceId);
+    	editor.commit();
+    	AttaBaseContract.gaTracker.trackEvent("Set Home Base", "", "", (int) serviceId);
+	}
+	
 	
 	public class AttaBaseSchema implements BaseColumns{
 		public static final String TABLE_ALL = 
@@ -214,5 +245,10 @@ public class AttaBaseContract {
 		inFromLeft.setDuration(250);
 		inFromLeft.setInterpolator(new AccelerateInterpolator());
 		return inFromLeft;
+	}
+	public static Animation noAnimation() {
+		Animation noAnim = new AlphaAnimation(1,1);
+		noAnim.setDuration(0);
+		return noAnim;
 	}
 }

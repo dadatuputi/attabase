@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.net.Uri.Builder;
 import co.bantamstudio.attabase.ActivityBaseList.SERVICE;
 
 public class Service {

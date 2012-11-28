@@ -1046,6 +1046,7 @@ containing a value of this type.
         public static final int edit_query=0x7f040027;
         public static final int fax=0x7f040061;
         public static final int faxGroup=0x7f040060;
+        public static final int feedback=0x7f04006b;
         public static final int filterText=0x7f04005a;
         public static final int homeAsUp=0x7f040006;
         public static final int imageView1=0x7f040034;
@@ -1199,6 +1200,7 @@ containing a value of this type.
         public static final int dsn_fax=0x7f09003a;
         public static final int edit_message=0x7f090013;
         public static final int fax=0x7f090038;
+        public static final int feedback=0x7f09003b;
         public static final int filter_hint=0x7f090037;
         public static final int hello_world=0x7f090010;
         public static final int home_base=0x7f090026;

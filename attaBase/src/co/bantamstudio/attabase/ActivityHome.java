@@ -1,53 +1,59 @@
 package co.bantamstudio.attabase;
 
-import java.io.IOException;
-import java.util.List;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class ActivityHome extends Activity {
+public class ActivityHome extends SherlockActivity {
 	
 	public final static String EXTRA_MESSAGE = "co.bantamstudio.attaBase.MESSAGE";
 	private Base mCurrentBase;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    	setTheme(R.style.Theme_Sherlock_Light);
+    	super.onCreate(savedInstanceState);
+        
+        // INITIALIZE GA TRACKER
+        AttaBaseContract.gaTracker.startNewSession(AttaBaseContract.gaID, 60, getApplicationContext());
     }
     
     @Override
     protected void onStart() {
         super.onStart();  // Always call the superclass method first
         
-        // Load boolean flag 
+        // CHECK TO SEE IF USER HAS SET DEFAULT BASE / SERVICE
         SharedPreferences prefs = getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
         boolean hasImported = prefs.getBoolean(AttaBaseContract.PREFS_IMPORTED_BOOL, false);
         long base = prefs.getLong(AttaBaseContract.PREFS_HOME_BASE_INT, AttaBaseContract.NO_BASE);
         long service = prefs.getLong(AttaBaseContract.PREFS_HOME_SERVICE_INT, AttaBaseContract.NO_SERVICE);
         
-        // If initial import hasn't occurred, start import activity
+        // IF INITIAL IMPORT HASN'T OCCURED, IMPORT CSV FILE
         if (!hasImported){
+        	AttaBaseContract.gaTracker.trackPageView("Import");
         	Intent intent = new Intent(this.getApplicationContext(), ActivityImportCSV.class);
         	startActivity(intent);
         }
         else if(base == AttaBaseContract.NO_BASE || service == AttaBaseContract.NO_SERVICE){
+        	AttaBaseContract.gaTracker.trackPageView("Wizard");
         	Intent intent = new Intent(this.getApplicationContext(), ActivityWizard.class);
         	startActivity(intent);
         }        
         
+        // TRY TO BUILD A BASE OBJECT WITH USER SETTINGS
         try {
 			mCurrentBase = new Base(this, new Service(this,service), base);
 		} catch (Exception e) {
@@ -64,9 +70,44 @@ public class ActivityHome extends Activity {
         // Activity being restarted from stopped state    
     }
     
-    private void populateHomeScreen(){
-    	//getBaseAddress
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+    	getSupportActionBar().setDisplayOptions(
+                ActionBar.DISPLAY_SHOW_CUSTOM |
+                ActionBar.DISPLAY_SHOW_HOME |
+                ActionBar.DISPLAY_SHOW_TITLE |
+                ActionBar.DISPLAY_USE_LOGO);
+   	
     	
+    	// CREATE DONATE MENU
+    	MenuItem donateMenu = menu.add("Donate");
+    	donateMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+    	donateMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			public boolean onMenuItemClick(MenuItem item) {
+		    	Uri websiteUri = Uri.parse(AttaBaseContract.PAYPAL_DONATE);
+		    	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
+		    	AttaBaseContract.gaTracker.trackPageView("Donate");
+		    	startActivity(intent);
+				return true;
+			}
+		});
+    	
+    	// CREATE FEEDBACK MENU
+    	MenuItem feedBackMenu = menu.add("Feedback");
+    	feedBackMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+    	feedBackMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			public boolean onMenuItemClick(MenuItem item) {
+		    	Uri websiteUri = Uri.parse(AttaBaseContract.FEEDBACK_LINK);
+		    	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
+		    	AttaBaseContract.gaTracker.trackPageView("Feedback");
+		    	startActivity(intent);
+				return true;
+			}
+		});
+    	return super.onCreateOptionsMenu(menu);
+    }
+    
+    private void populateHomeScreen(){
         // LOAD LAYOUT XML    
         LinearLayout ll = (LinearLayout) findViewById(R.id.addressBlockSmall);
         if (mCurrentBase != null && mCurrentBase.getLocation()!=null){
@@ -96,12 +137,19 @@ public class ActivityHome extends Activity {
         }
     }
     
+    // BUTTON AT BOTTOM OF HOME SCREEN TO BROWSE ALL LOCATIONS
     public void buttonBrowse(View view){
+    	// GA
+    	AttaBaseContract.gaTracker.trackPageView("Browse All");
+    	
     	Intent intent = new Intent(getBaseContext(), ActivityBaseList.class);
     	startActivity(intent);
     }
-    
+    // VIEW HOME BASE
     public void goToBase(View view){
+    	// GA
+    	AttaBaseContract.gaTracker.trackPageView("Home Base View");
+    	
     	Intent intent = new Intent(getBaseContext(), ActivityBaseList.class);
     	intent.putExtra(AttaBaseContract.BASE_LIST_STATE, AttaBaseContract.BASE_LIST_BASE);
     	intent.putExtra(AttaBaseContract.BASE_LIST_SERVICE_INDEX, mCurrentBase.getService().getServiceIndex());
@@ -110,50 +158,40 @@ public class ActivityHome extends Activity {
     }
     public void goToWebsite(View view){
     	Uri websiteUri = Uri.parse(mCurrentBase.getLocation().getWebsite1());
+    	// GA
+    	AttaBaseContract.gaTracker.trackEvent("External URL", "Home", mCurrentBase.getLocation().getWebsite1(), (int) mCurrentBase.getBaseIndex());
+    	
     	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
     	startActivity(intent);
     }
     public void goToDialer(View view){
     	Uri phoneUri = Uri.parse("tel:"+mCurrentBase.getLocation().getLocationPhone1());
+    	// GA
+    	AttaBaseContract.gaTracker.trackEvent("Dialer", "Home", mCurrentBase.getLocation().getLocationPhone1(), (int) mCurrentBase.getBaseIndex());
+    	
     	Intent intent = new Intent(Intent.ACTION_VIEW, phoneUri);
     	startActivity(intent);
     }
-    @SuppressLint("NewApi")
 	public void goToMap(View view){
-    	String address = 	mCurrentBase.getLocation().getLocationAddress1() +
-    						(mCurrentBase.getLocation().getLocationAddress2().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationAddress2())) +
-    						(mCurrentBase.getLocation().getLocationAddress3().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationAddress3())) +
-    						(mCurrentBase.getLocation().getLocationAddress4().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationAddress4())) +
-    						(mCurrentBase.getLocation().getLocationCity().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationCity())) +
-    						(mCurrentBase.getLocation().getLocationState().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationState())) +
-    						(mCurrentBase.getLocation().getLocationZip().equalsIgnoreCase("")?"":(" "+mCurrentBase.getLocation().getLocationZip())) +
-    						(mCurrentBase.getLocation().getLocationCountry().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationCountry()));
-    	String addressLabel = mCurrentBase.getBaseString();
-    	
-    	Uri locationUri = null;
-    	boolean useSimpleLocation = true;
-    	
-    	if (Build.VERSION.SDK_INT >= 9 && Geocoder.isPresent()){
-    		useSimpleLocation = false;
-    		Geocoder gc = new Geocoder(this);
-    		List<Address> al = null;
-			try {
-				al = gc.getFromLocationName(address, 1);
-	    		double lat = al.get(0).getLatitude();
-	    		double lon = al.get(0).getLongitude();
-	    		locationUri = Uri.parse("geo:"+lat+","+lon+"?z=1");
-			} catch (IOException e) {
-				Log.d(AttaBaseContract.APP_STRING, e.getMessage());
-				useSimpleLocation = true;
-			}
-    	}
-    	
-    	if (useSimpleLocation)    	
-    		locationUri = Uri.parse("geo:0,0?q="+address+"("+addressLabel+")");
-				
-    	if (locationUri != null){
-    		Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
-        	startActivity(intent);
-    	}
+		try {
+	    	String address = 	mCurrentBase.getLocation().getLocationAddress1() +
+	    						(mCurrentBase.getLocation().getLocationAddress2().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationAddress2())) +
+	    						(mCurrentBase.getLocation().getLocationAddress3().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationAddress3())) +
+	    						(mCurrentBase.getLocation().getLocationAddress4().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationAddress4())) +
+	    						(mCurrentBase.getLocation().getLocationCity().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationCity())) +
+	    						(mCurrentBase.getLocation().getLocationState().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationState())) +
+	    						(mCurrentBase.getLocation().getLocationZip().equalsIgnoreCase("")?"":(" "+mCurrentBase.getLocation().getLocationZip())) +
+	    						(mCurrentBase.getLocation().getLocationCountry().equalsIgnoreCase("")?"":(", "+mCurrentBase.getLocation().getLocationCountry()));
+	    	String addressLabel = mCurrentBase.getBaseString();
+	    	
+	    	Uri locationUri = Uri.parse("geo:0,0?q="+address+"("+addressLabel+")");
+	    	// GA
+	    	AttaBaseContract.gaTracker.trackEvent("Map", "Home", addressLabel + " " + address, (int) mCurrentBase.getBaseIndex());
+			
+	    	Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
+			startActivity(intent);
+		} catch (ActivityNotFoundException e) {
+			Log.d(AttaBaseContract.APP_STRING, e.getMessage());
+		}
     }
 }

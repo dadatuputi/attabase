@@ -8,7 +8,7 @@
     <string name="edit_message">Enter a message</string>
     <string name="button_send">Send</string>
     <string name="title_activity_display_message">My Message</string>
-    <string name="title_activity_show_all_entries">ShowAllEntries</string>
+    <string name="title_activity_show_all_entries">attaBase Initial Import</string>
     <string name="importing">We are performing the initial import of the base data. This may take several minutes, depending on your phone (there are approximately 15k locations to import). This only needs to be performed once.</string>
     <string name="bases">Bases Imported:</string>
     <string name="locations">Locations Imported: </string>
@@ -45,5 +45,6 @@
     <string name="fax">Fax: </string>
     <string name="dsn">"DSN: "</string>
     <string name="dsn_fax">"DSN Fax: "</string>
+    <string name="feedback">Feedback</string>
 
 </resources>

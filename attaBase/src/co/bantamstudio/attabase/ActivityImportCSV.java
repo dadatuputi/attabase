@@ -4,16 +4,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Hashtable;
+import java.util.zip.ZipInputStream;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -22,7 +29,7 @@ import android.support.v4.app.NavUtils;
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 
-public class ActivityImportCSV extends Activity {
+public class ActivityImportCSV extends SherlockActivity {
 
 	private SQLiteDatabase mDb;
 	private AttaBaseDatabase mAttaBaseDatabase;
@@ -34,15 +41,32 @@ public class ActivityImportCSV extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
+        setTheme(R.style.Theme_Sherlock_Light);
         setContentView(R.layout.activity_import_csv_importing);
         mAttaBaseDatabase = new AttaBaseDatabase(this);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_show_all_entries, menu);
-        return true;
+    public boolean onCreateOptionsMenu(Menu menu){
+    	ActionBar bar = getSupportActionBar();
+    	bar.setDisplayOptions(
+                ActionBar.DISPLAY_SHOW_CUSTOM |
+                ActionBar.DISPLAY_SHOW_HOME |
+                ActionBar.DISPLAY_SHOW_TITLE |
+                ActionBar.DISPLAY_USE_LOGO);
+    	// CREATE FEEDBACK MENU
+    	MenuItem feedBackMenu = menu.add("Feedback");
+    	feedBackMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+    	feedBackMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			public boolean onMenuItemClick(MenuItem item) {
+		    	Uri websiteUri = Uri.parse(AttaBaseContract.FEEDBACK_LINK);
+		    	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
+		    	AttaBaseContract.gaTracker.trackPageView("Feedback");
+		    	startActivity(intent);
+				return true;
+			}
+		});
+    	return super.onCreateOptionsMenu(menu);
     }
     
     @Override
@@ -69,6 +93,14 @@ public class ActivityImportCSV extends Activity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mAttaBaseDatabase != null) {
+        	mAttaBaseDatabase.close();
+        }
     }
     
     public void initialImport(View view) {
@@ -135,10 +167,13 @@ public class ActivityImportCSV extends Activity {
 			
 			AssetManager am = getAssets();
 			InputStream is;
+			ZipInputStream zip;
 			InputStreamReader isr;
 			try {
-				is = am.open(AttaBaseContract.IMPORT_SOURCE_CSV);
-				isr = new InputStreamReader(is);
+				is = am.open(AttaBaseContract.IMPORT_SOURCE_ZIP);
+				zip = new ZipInputStream(is);
+				isr = new InputStreamReader(zip);
+				zip.getNextEntry();
 			} catch (IOException e) {
 				e.printStackTrace();
 				return -1;
@@ -255,6 +290,7 @@ public class ActivityImportCSV extends Activity {
 					db.setTransactionSuccessful();
 				} finally {
 					db.endTransaction();
+					db.close();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

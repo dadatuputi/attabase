@@ -3,6 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+    
+       <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
 
     <LinearLayout
         android:id="@+id/addressBlockSmall"
@@ -316,5 +320,5 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
+</ScrollView>
 </LinearLayout>

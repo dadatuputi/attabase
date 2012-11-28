@@ -60,7 +60,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="@string/filter_hint" >
+        android:hint="@string/filter_hint"
+        android:visibility="gone" >
 
         <requestFocus />
     </EditText>

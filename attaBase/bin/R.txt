@@ -340,6 +340,7 @@ int id dsn_fax 0x7f040066
 int id edit_query 0x7f040027
 int id fax 0x7f040061
 int id faxGroup 0x7f040060
+int id feedback 0x7f04006b
 int id filterText 0x7f04005a
 int id homeAsUp 0x7f040006
 int id imageView1 0x7f040034
@@ -455,6 +456,7 @@ int string dsn 0x7f090039
 int string dsn_fax 0x7f09003a
 int string edit_message 0x7f090013
 int string fax 0x7f090038
+int string feedback 0x7f09003b
 int string filter_hint 0x7f090037
 int string hello_world 0x7f090010
 int string home_base 0x7f090026
