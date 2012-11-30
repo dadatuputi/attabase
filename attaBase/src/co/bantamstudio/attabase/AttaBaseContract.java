@@ -44,6 +44,7 @@ public class AttaBaseContract {
 	
 	// PREFERENCES
 	public static final String PREFS_IMPORTED_BOOL = "importedBool";
+	public static final String PREFS_FIRSTRUN_BOOL = "firstRunBool";
 	public static final String PREFS_HOME_BASE_INT = "homeBaseInt";
 	public static final String PREFS_HOME_SERVICE_INT = "homeServiceInt";
 	

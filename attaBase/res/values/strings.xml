@@ -46,5 +46,12 @@
     <string name="dsn">"DSN: "</string>
     <string name="dsn_fax">"DSN Fax: "</string>
     <string name="feedback">Feedback</string>
+    <string name="select_service_query_title">Select defaults?</string>
+    <string name="noBaseText">No base has been set. To set a base, click the flag button when browsing.</string>
+    <string name="button_home_description">Home Button</string>
+    <string name="image_bookmark">Bookmark Icon</string>
+    <string name="button_compass_description">Compass Button</string>
+    <string name="button_phone_description">Phone Button</string>
+    <string name="button_maps_description">Maps Button</string>
 
 </resources>

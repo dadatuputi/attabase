@@ -2,6 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
+    
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -102,20 +106,21 @@
             android:textStyle="bold"
             tools:context=".ShowAllEntries" />
 
+        <RelativeLayout
+            style="@style/BottomRelativeLayout"
+            android:layout_width="match_parent" >
+
+            <Button
+                android:id="@+id/importContinueButton"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="53dp"
+                android:onClick="leaveImport"
+                android:text="@string/button_continue"
+                android:visibility="invisible" />
+        </RelativeLayout>
+
     </LinearLayout>
-
-    <RelativeLayout
-        style="@style/BottomRelativeLayout" >
-
-        <Button
-            android:id="@+id/importContinueButton"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="53dp"
-            android:onClick="leaveImport"
-            android:text="@string/button_continue"
-            android:visibility="invisible" />
-
-    </RelativeLayout>
+    </ScrollView>
 
 </RelativeLayout>
