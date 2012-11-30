@@ -552,7 +552,8 @@ public class ActivityBaseList extends SherlockActivity {
     	case VIEW_BASE:
     		try {
 				mCurrentBase = new Base(this, mCurrentService,index);
-			} catch (Exception e) {
+    		} catch (NullPointerException e) {
+   			} catch (Exception e) {
 				Log.d("Exception", e.getMessage());
 			}
     		setupBookmark();

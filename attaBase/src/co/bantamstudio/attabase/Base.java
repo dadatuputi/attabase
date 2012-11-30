@@ -20,22 +20,10 @@ public class Base {
 		this.baseIndex = baseIndex;
 		
 		ContentResolver cr = context.getContentResolver();
-		//Uri baseUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_BASE, String.valueOf(baseIndex));
-		//Cursor baseInfo = cr.query(baseUri, null, null, null, null);
-		//Cursor baseInfo = mDbHelper.getBase(baseIndex);
-    	//if (baseInfo.moveToFirst()){
-    	//	baseString = baseInfo.getString(baseInfo.getColumnIndex(AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME));
-        //}
-    	//else {
-    	//	baseInfo.close();
-    	//	throw new Exception("no base found");
-    	//}
-    	//baseInfo.close();
-    	
 		Uri baseUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_BASE, String.valueOf(baseIndex));
 		baseUri = Uri.withAppendedPath(baseUri, "address");
     	Cursor locationInfo = cr.query(baseUri, null, null, null, null);
-    	if (locationInfo.moveToFirst()){
+    	if (locationInfo != null && locationInfo.moveToFirst()){
     		baseString = locationInfo.getString(1);
     		location = new Location(service, this, locationInfo.getInt(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema._ID)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME)),
@@ -61,17 +49,21 @@ public class Base {
     		locationInfo.close();
     	}
     	else {
-    		// TODO test for locations without "Location"
+    		// Close cursor if no address found
+    		if (locationInfo != null)
+    			locationInfo.close();
+    		
     		location = null;
-    		locationInfo.close();
+    		
     		baseUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_BASE, String.valueOf(baseIndex));
     		Cursor baseInfo = cr.query(baseUri, null, null, null, null);
-        	if (baseInfo.moveToFirst()){
+        	if (baseInfo != null && baseInfo.moveToFirst()){
         		baseString = baseInfo.getString(baseInfo.getColumnIndex(AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME));
         		baseInfo.close();
             }
         	else {
-        		baseInfo.close();
+        		if (baseInfo != null)
+        			baseInfo.close();
         		throw new Exception("no base found");
         	}
     	}
