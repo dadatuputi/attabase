@@ -110,7 +110,7 @@ public class ActivityHome extends SherlockActivity {
     private void populateHomeScreen(){
         // LOAD LAYOUT XML    
         LinearLayout ll = (LinearLayout) findViewById(R.id.addressBlockSmall);
-        if (mCurrentBase != null && mCurrentBase.getLocation()!=null){
+        if (mCurrentBase != null && mCurrentBase.hasAddress() && mCurrentBase.getLocation()!=null){
         	((TextView)ll.findViewById(R.id.baseName)).setText(mCurrentBase.getBaseString());
         	((TextView)ll.findViewById(R.id.address1)).setText(mCurrentBase.getLocation().getLocationAddress1());
         	((TextView)ll.findViewById(R.id.address2)).setText(mCurrentBase.getLocation().getLocationAddress2());
@@ -133,7 +133,17 @@ public class ActivityHome extends SherlockActivity {
         		((TextView)ll.findViewById(R.id.address2)).setVisibility(LinearLayout.GONE);
         	if (mCurrentBase.getLocation().getLocationAddress3().equalsIgnoreCase(""))
         		((TextView)ll.findViewById(R.id.address3)).setVisibility(LinearLayout.GONE);
-        	
+        }
+        // IF BASE DOESN'T HAVE ADDRESS, JUST SHOW LINK TO BASE VIEW
+        else if (mCurrentBase != null){
+        	((TextView)ll.findViewById(R.id.baseName)).setText(mCurrentBase.getBaseString());
+        	((LinearLayout)ll.findViewById(R.id.addressGroup)).setVisibility(LinearLayout.GONE);
+        	((LinearLayout)ll.findViewById(R.id.phoneGroup)).setVisibility(LinearLayout.GONE);
+        	((LinearLayout)ll.findViewById(R.id.websiteGroup)).setVisibility(LinearLayout.GONE);
+        }
+        // IF BASE IS NULL, DON'T SHOW ANYTHING BUT THE BROWSE
+        else {
+        	((LinearLayout)ll.findViewById(R.id.addressBlockSmall)).setVisibility(LinearLayout.GONE);
         }
     }
     
