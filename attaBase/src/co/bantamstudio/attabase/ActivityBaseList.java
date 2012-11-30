@@ -295,6 +295,7 @@ public class ActivityBaseList extends SherlockActivity {
         	break;
         case VIEW_BASE:
         	Uri baseLocationsUri = Uri.withAppendedPath(AttaBaseProvider.CONTENT_URI_BASE, String.valueOf(base.getBaseIndex()));
+        	baseLocationsUri = Uri.withAppendedPath(baseLocationsUri, "location");
         	cursor = managedQuery(baseLocationsUri, null, null, null, null);
         	columns = new String[] {AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME, AttaBaseContract.LocationSchema.COLUMN_NAME_NICE_LOCATION};
             to = new int[] {R.id.name_entry, R.id.name_entry_sub};
