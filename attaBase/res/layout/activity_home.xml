@@ -55,11 +55,12 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/addressGroup"
+                style="@style/LocationGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/LocationGroup"
-                android:orientation="vertical"
-                android:onClick="goToMap" >
+                android:onClick="goToMap"
+                android:orientation="vertical" >
 
                 <TextView
                     android:id="@+id/textView3"

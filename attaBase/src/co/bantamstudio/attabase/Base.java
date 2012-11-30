@@ -10,6 +10,7 @@ public class Base {
 	private Service service;
 	private Location location;
 	private long baseIndex;
+	private boolean hasAddress;
 
 
 	Base(Context context, Service service, long baseIndex) throws Exception{
@@ -46,9 +47,11 @@ public class Base {
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE1)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE2)),
     				locationInfo.getString(locationInfo.getColumnIndex(AttaBaseContract.LocationSchema.COLUMN_NAME_WEBSITE3)));
+    		hasAddress = true;
     		locationInfo.close();
     	}
     	else {
+    		hasAddress = false;    		
     		// Close cursor if no address found
     		if (locationInfo != null)
     			locationInfo.close();
@@ -68,28 +71,23 @@ public class Base {
         	}
     	}
 	}
-
-
+	
 	public String getBaseString() {
 		return baseString;
 	}
-
 	public String getServiceString() {
 		return service.getServiceString();
 	}
-
-
 	public Service getService() {
 		return service;
 	}
-	
 	public long getBaseIndex(){
 		return baseIndex;
 	}
-	
 	public Location getLocation(){
 		return location;
 	}
-	
-
+	public boolean hasAddress() {
+		return hasAddress;
+	}
 }
