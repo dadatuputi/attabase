@@ -38,6 +38,7 @@ public class AttaBaseProvider extends ContentProvider {
 	private static final int SEARCH_SUGGEST_LOCATION = 7;
 	private static final int GET_BASE_ADDRESS = 8;
 	private static final int GET_SERVICE_BASES = 9;
+	private static final int GET_BASE_LOCATIONS = 10;
 	private static final UriMatcher sURIMatcher = buildUriMatcher();
 	
 	private static UriMatcher buildUriMatcher() {
@@ -48,6 +49,7 @@ public class AttaBaseProvider extends ContentProvider {
 		matcher.addURI(AUTHORITY, "service/#/base", GET_SERVICE_BASES);
 		matcher.addURI(AUTHORITY, "base", SEARCH_BASES);
 		matcher.addURI(AUTHORITY, "base/#", GET_BASE);
+		matcher.addURI(AUTHORITY, "base/#/location", GET_BASE_LOCATIONS);
 		matcher.addURI(AUTHORITY, "base/#/address", GET_BASE_ADDRESS);
 		matcher.addURI(AUTHORITY, "location", SEARCH_LOCATIONS);
 		matcher.addURI(AUTHORITY, "location/#", GET_LOCATION);
@@ -63,12 +65,15 @@ public class AttaBaseProvider extends ContentProvider {
 	public String getType(Uri uri) {
 		switch (sURIMatcher.match(uri)) {
 		case SEARCH_BASES:
+		case GET_BASE_LOCATIONS:
 		case GET_BASE:
 			return ATTABASE_BASE_MIME_TYPE;
 		case SEARCH_SERVICES:
+		case GET_SERVICE_BASES:
 		case GET_SERVICE:
 			return ATTABASE_SERVICE_MIME_TYPE;
 		case SEARCH_LOCATIONS:
+		case GET_BASE_ADDRESS:
 		case GET_LOCATION:
 			return ATTABASE_LOCATION_MIME_TYPE;
 		default:
@@ -122,6 +127,8 @@ public class AttaBaseProvider extends ContentProvider {
 			return getBaseAddress(uri);
 		case GET_BASE:
 			return getBase(uri);
+		case GET_BASE_LOCATIONS:
+			return getBaseLocations(uri);
 		case GET_SERVICE:
 			return getService(uri);
 		case GET_LOCATION:
@@ -225,13 +232,22 @@ public class AttaBaseProvider extends ContentProvider {
 	private Cursor getBase(Uri uri) {
 		String baseId = uri.getLastPathSegment();
 		String[] columns = new String[] {
+				BaseColumns._ID,
+				AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME,
+		};
+		return mAttaBaseDatabase.getBase(baseId, columns);
+	}
+	private Cursor getBaseLocations(Uri uri) {
+		List<String> segments = uri.getPathSegments();
+		String baseId = segments.get(1);
+		String[] columns = new String[] {
 				"c." + BaseColumns._ID,
 				"a." + AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME,
 				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_SEARCH_LOCATION,
 				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_NICE_LOCATION,
 				"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME
 		};
-		return mAttaBaseDatabase.getBase(baseId, columns);
+		return mAttaBaseDatabase.getBaseLocations(baseId, columns);
 	}
 	private Cursor getService(Uri uri) {
 		String serviceId = uri.getLastPathSegment();

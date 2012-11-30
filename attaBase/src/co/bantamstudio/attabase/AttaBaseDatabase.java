@@ -24,9 +24,15 @@ public class AttaBaseDatabase {
 		if (mDbHelper != null)
 			mDbHelper.close();
 	}
-
+	
 	// GET OBJECTS
 	public Cursor getBase(String baseId, String[] columns) {
+		String selection = AttaBaseContract.BaseSchema._ID + " = ?";
+		String[] selectionArgs = new String[] {baseId};
+		
+		return query(selection, selectionArgs, columns, AttaBaseContract.BaseSchema.TABLE_NAME, null, null, null);
+	}
+	public Cursor getBaseLocations(String baseId, String[] columns) {
 		String selection = "a." + AttaBaseContract.BaseSchema._ID + " = ?";
 		String[] selectionArgs = new String[] {baseId};
 		
