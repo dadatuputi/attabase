@@ -6,12 +6,16 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -36,22 +40,50 @@ public class ActivityHome extends SherlockActivity {
         super.onStart();  // Always call the superclass method first
         
         // CHECK TO SEE IF USER HAS SET DEFAULT BASE / SERVICE
-        SharedPreferences prefs = getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
+        final SharedPreferences prefs = getSharedPreferences(AttaBaseContract.APP_STRING, Context.MODE_PRIVATE);
         boolean hasImported = prefs.getBoolean(AttaBaseContract.PREFS_IMPORTED_BOOL, false);
+        boolean firstRun = prefs.getBoolean(AttaBaseContract.PREFS_FIRSTRUN_BOOL, true);
         long base = prefs.getLong(AttaBaseContract.PREFS_HOME_BASE_INT, AttaBaseContract.NO_BASE);
         long service = prefs.getLong(AttaBaseContract.PREFS_HOME_SERVICE_INT, AttaBaseContract.NO_SERVICE);
         
         // IF INITIAL IMPORT HASN'T OCCURED, IMPORT CSV FILE
         if (!hasImported){
         	AttaBaseContract.gaTracker.trackPageView("Import");
-        	Intent intent = new Intent(this.getApplicationContext(), ActivityImportCSV.class);
+        	Intent intent = new Intent(getApplicationContext(), ActivityImportCSV.class);
         	startActivity(intent);
         }
-        else if(base == AttaBaseContract.NO_BASE || service == AttaBaseContract.NO_SERVICE){
-        	AttaBaseContract.gaTracker.trackPageView("Wizard");
-        	Intent intent = new Intent(this.getApplicationContext(), ActivityWizard.class);
-        	startActivity(intent);
-        }        
+        //else if(base == AttaBaseContract.NO_BASE || service == AttaBaseContract.NO_SERVICE){
+        else if(firstRun){
+    		// Pop up dialog asking if they want to select a base
+    		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+    		alert.setMessage("Would you like to set your default service and base location now?\nYou will have an opportunity to select these later if you would like.");
+    		alert.setPositiveButton((CharSequence)"Yes", new OnClickListener() {
+				
+				public void onClick(DialogInterface dialog, int which) {
+			    	SharedPreferences.Editor editor = prefs.edit();
+			    	editor.putBoolean(AttaBaseContract.PREFS_FIRSTRUN_BOOL, false);
+			    	editor.commit();
+			    	
+					// LAUNCH WIZARD
+			    	AttaBaseContract.gaTracker.trackPageView("Wizard");
+			    	Intent intent = new Intent(getApplicationContext(), ActivityWizard.class);
+			    	startActivity(intent);						
+				}
+			});
+    		alert.setNegativeButton((CharSequence)"No", new OnClickListener() {
+				
+				public void onClick(DialogInterface dialog, int which) {
+					SharedPreferences.Editor editor = prefs.edit();
+			    	editor.putBoolean(AttaBaseContract.PREFS_FIRSTRUN_BOOL, false);
+			    	editor.commit();
+				}
+			});
+    		alert.show();
+        }     
+        
+//    	AttaBaseContract.gaTracker.trackPageView("Wizard");
+//    	Intent intent = new Intent(this.getApplicationContext(), ActivityWizard.class);
+//    	startActivity(intent);
         
         // TRY TO BUILD A BASE OBJECT WITH USER SETTINGS
         try {
@@ -61,13 +93,6 @@ public class ActivityHome extends SherlockActivity {
 		}
         setContentView(R.layout.activity_home);
         populateHomeScreen();
-    }
-    
-    @Override
-    protected void onRestart() {
-        super.onRestart();  // Always call the superclass method first
-        
-        // Activity being restarted from stopped state    
     }
     
     @Override
@@ -137,13 +162,15 @@ public class ActivityHome extends SherlockActivity {
         // IF BASE DOESN'T HAVE ADDRESS, JUST SHOW LINK TO BASE VIEW
         else if (mCurrentBase != null){
         	((TextView)ll.findViewById(R.id.baseName)).setText(mCurrentBase.getBaseString());
+
+        }
+        // IF BASE IS NULL, DON'T SHOW ANYTHING BUT THE BROWSE BUTTON & MESSAGE
+        else {
+        	((TextView)ll.findViewById(R.id.baseName)).setText("No default base set");
         	((LinearLayout)ll.findViewById(R.id.addressGroup)).setVisibility(LinearLayout.GONE);
         	((LinearLayout)ll.findViewById(R.id.phoneGroup)).setVisibility(LinearLayout.GONE);
         	((LinearLayout)ll.findViewById(R.id.websiteGroup)).setVisibility(LinearLayout.GONE);
-        }
-        // IF BASE IS NULL, DON'T SHOW ANYTHING BUT THE BROWSE
-        else {
-        	((LinearLayout)ll.findViewById(R.id.addressBlockSmall)).setVisibility(LinearLayout.GONE);
+        	((LinearLayout)ll.findViewById(R.id.noBaseText)).setVisibility(LinearLayout.VISIBLE);
         }
     }
     
