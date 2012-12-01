@@ -976,8 +976,9 @@ containing a value of this type.
         public static final int ic_menu_mylocation=0x7f020079;
         public static final int ic_menu_myplaces=0x7f02007a;
         public static final int ic_menu_refresh=0x7f02007b;
-        public static final int marines_symbol=0x7f02007c;
-        public static final int navy_symbol=0x7f02007d;
+        public static final int ic_right_arrow=0x7f02007c;
+        public static final int marines_symbol=0x7f02007d;
+        public static final int navy_symbol=0x7f02007e;
     }
     public static final class id {
         public static final int ImageView01=0x7f04004b;
@@ -1128,11 +1129,12 @@ containing a value of this type.
         public static final int activity_wizard_3=0x7f03001f;
         public static final int activity_wizard_list=0x7f030020;
         public static final int base_list_item=0x7f030021;
-        public static final int base_list_view=0x7f030022;
-        public static final int base_location_view=0x7f030023;
-        public static final int preferences=0x7f030024;
-        public static final int sherlock_spinner_dropdown_item=0x7f030025;
-        public static final int sherlock_spinner_item=0x7f030026;
+        public static final int base_list_item_has_sub=0x7f030022;
+        public static final int base_list_view=0x7f030023;
+        public static final int base_location_view=0x7f030024;
+        public static final int preferences=0x7f030025;
+        public static final int sherlock_spinner_dropdown_item=0x7f030026;
+        public static final int sherlock_spinner_item=0x7f030027;
     }
     public static final class menu {
         public static final int activity_action_bar=0x7f0b0000;

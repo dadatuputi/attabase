@@ -285,7 +285,7 @@ public class ActivityBaseList extends SherlockActivity {
         	cursor = managedQuery(serviceUri, null, null, null, null);
             columns = new String[] {AttaBaseContract.BaseSchema.COLUMN_NAME_BASE_NAME, AttaBaseContract.LocationSchema.COLUMN_NAME_NICE_LOCATION};
             to = new int[] {R.id.name_entry, R.id.name_entry_sub};
-            adapter = new SimpleCursorAdapter(this, R.layout.base_list_item, cursor, columns, to);
+            adapter = new SimpleCursorAdapter(this, R.layout.base_list_item_has_sub, cursor, columns, to);
         	break;
         case VIEW_SERVICES:
     		cursor = managedQuery(AttaBaseProvider.CONTENT_URI_SERVICE, null, null, null, null);
@@ -299,7 +299,7 @@ public class ActivityBaseList extends SherlockActivity {
         	cursor = managedQuery(baseLocationsUri, null, null, null, null);
         	columns = new String[] {AttaBaseContract.LocationSchema.COLUMN_NAME_LOCATION_NAME, AttaBaseContract.LocationSchema.COLUMN_NAME_NICE_LOCATION};
             to = new int[] {R.id.name_entry, R.id.name_entry_sub};
-            adapter = new SimpleCursorAdapter(this, R.layout.base_list_item, cursor, columns, to);
+            adapter = new SimpleCursorAdapter(this, R.layout.base_list_item_has_sub, cursor, columns, to);
             break;
 		default:
 			cursor = null;
