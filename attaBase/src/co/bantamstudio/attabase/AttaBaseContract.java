@@ -36,7 +36,7 @@ public class AttaBaseContract {
 	public static final String PAYPAL_DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TJSPTZXU5S6HQ";
 	
 	// FEEDBACK
-	public static final String FEEDBACK_LINK = "http://bantamstudio.co/form/attabase";
+	public static final String FEEDBACK_LINK = "http://bantamstudio.co/attabase/feedback";
 	
 	// GOOGLE ANALYTICS
 	public static GoogleAnalyticsTracker gaTracker = GoogleAnalyticsTracker.getInstance();
@@ -98,7 +98,6 @@ public class AttaBaseContract {
 					"c." + AttaBaseContract.LocationSchema.COLUMN_NAME_BASE + " = " +
 					"a." + AttaBaseContract.BaseSchema._ID;
 	}
-	
 	public class BaseSchema implements BaseColumns{
 		public static final String TABLE_NAME = "base";
 		public static final String COLUMN_NAME_BASE_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1;
