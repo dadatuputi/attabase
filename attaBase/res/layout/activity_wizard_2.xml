@@ -3,59 +3,60 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/scrollView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/textView1"
-            style="@style/HeaderLarge"
-            android:text="@string/wizard_2" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:background="@color/old_glory_blue"
-            android:orientation="horizontal" >
-        </LinearLayout>
+        android:layout_above="@+id/button1"
+        android:layout_alignParentTop="true" >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/textView2"
-                style="@style/HeaderMedium"
-                android:text="@string/select_base"
-                android:textSize="22sp" />
+                android:id="@+id/textView1"
+                style="@style/HeaderLarge"
+                android:text="@string/wizard_2" />
 
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/old_glory_blue"
+                android:orientation="horizontal" >
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/wizard_text_2"
-                android:textSize="18sp" />
+                android:layout_margin="20dp"
+                android:orientation="vertical" >
 
+                <TextView
+                    android:id="@+id/textView2"
+                    style="@style/HeaderMedium"
+                    android:text="@string/select_base"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/wizard_text_2"
+                    android:textSize="18sp" />
+            </LinearLayout>
         </LinearLayout>
+    </ScrollView>
 
-    </LinearLayout>
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="stepContinue"
+        android:text="@string/button_continue"
+        android:layout_alignParentBottom="true" />
 
-    <RelativeLayout
-        style="@style/BottomRelativeLayout"
-        android:layout_alignParentLeft="true" >
-
-        <Button
-            android:id="@+id/button1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/button_continue"
-            android:onClick="stepContinue" />
-    </RelativeLayout>
 
 </RelativeLayout>

@@ -55,7 +55,8 @@
 		<provider android:name=".AttaBaseProvider"
 		    android:exported="false"
 		    android:authorities="co.bantamstudio.attabase.AttaBaseProvider" />
-        
+        <activity android:name="com.google.ads.AdActivity"
+          android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
     </application>
 
 </manifest>

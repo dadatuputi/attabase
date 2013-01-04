@@ -53,5 +53,6 @@
     <string name="button_compass_description">Compass Button</string>
     <string name="button_phone_description">Phone Button</string>
     <string name="button_maps_description">Maps Button</string>
+    <string name="pub_id">a150e641291898c</string>
 
 </resources>
