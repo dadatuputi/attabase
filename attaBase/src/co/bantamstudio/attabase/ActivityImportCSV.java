@@ -10,11 +10,13 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import com.google.ads.AdRequest;
+import com.google.ads.AdView;
 
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,7 +27,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.support.v4.app.NavUtils;
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -41,33 +42,45 @@ public class ActivityImportCSV extends SherlockActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.Theme_Sherlock_Light);
         setContentView(R.layout.activity_import_csv_importing);
         mAttaBaseDatabase = new AttaBaseDatabase(this);
     }
-
+ 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
-    	ActionBar bar = getSupportActionBar();
-    	bar.setDisplayOptions(
+		this.getSherlock().getMenuInflater().inflate(R.menu.regular, menu);
+		
+    	getSupportActionBar().setDisplayOptions(
                 ActionBar.DISPLAY_SHOW_CUSTOM |
                 ActionBar.DISPLAY_SHOW_HOME |
                 ActionBar.DISPLAY_SHOW_TITLE |
                 ActionBar.DISPLAY_USE_LOGO);
-    	// CREATE FEEDBACK MENU
-    	MenuItem feedBackMenu = menu.add("Feedback");
-    	feedBackMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-    	feedBackMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			public boolean onMenuItemClick(MenuItem item) {
-		    	Uri websiteUri = Uri.parse(AttaBaseContract.FEEDBACK_LINK);
-		    	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
-		    	AttaBaseContract.gaTracker.trackPageView("Feedback");
-		    	startActivity(intent);
-				return true;
-			}
-		});
+    	
     	return super.onCreateOptionsMenu(menu);
     }
+    
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_feedback:
+			Uri websiteUri = Uri.parse(AttaBaseContract.FEEDBACK_LINK);
+			Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
+			startActivity(intent);
+			return true;
+		case R.id.menu_donate:
+	    	Uri donateUri = Uri.parse(AttaBaseContract.PAYPAL_DONATE);
+	    	Intent donateIntent = new Intent(Intent.ACTION_VIEW, donateUri);
+	    	AttaBaseContract.gaTracker.trackPageView("Donate");
+	    	startActivity(donateIntent);
+			return true;
+		case R.id.menu_settings:
+			Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+			startActivity(settingsIntent);
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
     
     @Override
     protected void onStart() {
@@ -86,13 +99,19 @@ public class ActivityImportCSV extends SherlockActivity {
     }
     
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+    protected void onResume() {
+    	
+        // INITIALIZE ADS
+        SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean ads = settingsPrefs.getBoolean(AttaBaseContract.PREFS_ADS_BOOLEAN, false);
+		AdView adView = (AdView)this.findViewById(R.id.adView);
+		if (!ads){
+			adView.loadAd(new AdRequest());
+			adView.setVisibility(View.VISIBLE);
+		} else {
+			adView.setVisibility(View.INVISIBLE);
+		}
+    	super.onResume();
     }
     
     @Override
@@ -105,6 +124,17 @@ public class ActivityImportCSV extends SherlockActivity {
     
     public void initialImport(View view) {
     	setContentView(R.layout.activity_import_csv_importing);
+    	
+        // INITIALIZE ADS
+        SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean ads = settingsPrefs.getBoolean(AttaBaseContract.PREFS_ADS_BOOLEAN, false);
+		AdView adView = (AdView)this.findViewById(R.id.adView);
+		if (!ads){
+			adView.loadAd(new AdRequest());
+			adView.setVisibility(View.VISIBLE);
+		} else {
+			adView.setVisibility(View.INVISIBLE);
+		}
     	
         mDb = mAttaBaseDatabase.getReadableDb();
         

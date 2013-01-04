@@ -1,5 +1,8 @@
 package co.bantamstudio.attabase;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -120,6 +123,13 @@ public class Service {
 
 	public long getServiceIndex() {
 		return serviceIndex;
+	}
+	
+	public Set<String> getKeywords(){
+		Set<String> keywords = new HashSet<String>();
+		if (getServiceString() != null)
+			keywords.add(getServiceString());
+		return keywords;
 	}
 
 }
