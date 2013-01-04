@@ -47,6 +47,7 @@ public class AttaBaseContract {
 	public static final String PREFS_FIRSTRUN_BOOL = "firstRunBool";
 	public static final String PREFS_HOME_BASE_INT = "homeBaseInt";
 	public static final String PREFS_HOME_SERVICE_INT = "homeServiceInt";
+	protected static final String PREFS_ADS_BOOLEAN = "pref_disable_ads";
 	
 	public static final int DATABASE_VERSION = 1;
 	public static final String DATABASE_NAME = "attaBase.db";

@@ -4,7 +4,8 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import com.google.ads.AdRequest;
+import com.google.ads.AdView;
 
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -15,6 +16,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -27,7 +29,6 @@ public class ActivityHome extends SherlockActivity {
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	setTheme(R.style.Theme_Sherlock_Light);
     	super.onCreate(savedInstanceState);
         
         // INITIALIZE GA TRACKER
@@ -45,13 +46,12 @@ public class ActivityHome extends SherlockActivity {
         long base = prefs.getLong(AttaBaseContract.PREFS_HOME_BASE_INT, AttaBaseContract.NO_BASE);
         long service = prefs.getLong(AttaBaseContract.PREFS_HOME_SERVICE_INT, AttaBaseContract.NO_SERVICE);
         
-        // IF INITIAL IMPORT HASN'T OCCURED, IMPORT CSV FILE
+        // IF INITIAL IMPORT HASN'T OCCURRED, IMPORT CSV FILE
         if (!hasImported){
         	AttaBaseContract.gaTracker.trackPageView("Import");
         	Intent intent = new Intent(getApplicationContext(), ActivityImportCSV.class);
         	startActivity(intent);
         }
-        //else if(base == AttaBaseContract.NO_BASE || service == AttaBaseContract.NO_SERVICE){
         else if(firstRun){
     		// Pop up dialog asking if they want to select a base
     		AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -95,41 +95,62 @@ public class ActivityHome extends SherlockActivity {
     }
     
     @Override
+    protected void onResume() {
+    	
+        // INITIALIZE ADS
+        SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean ads = settingsPrefs.getBoolean(AttaBaseContract.PREFS_ADS_BOOLEAN, false);
+		AdView adView = (AdView)this.findViewById(R.id.adView);
+		if (!ads){
+			AdRequest adReq = new AdRequest();
+			if (mCurrentBase != null) {
+				adReq.setKeywords(mCurrentBase.getKeywords());
+			}
+			adView.loadAd(adReq);
+			adView.setVisibility(View.VISIBLE);
+		} else {
+			adView.setVisibility(View.INVISIBLE);
+		}
+		
+    	super.onResume();
+    }
+      
+    @Override
     public boolean onCreateOptionsMenu(Menu menu){
+		this.getSherlock().getMenuInflater().inflate(R.menu.regular, menu);
+		
     	getSupportActionBar().setDisplayOptions(
                 ActionBar.DISPLAY_SHOW_CUSTOM |
                 ActionBar.DISPLAY_SHOW_HOME |
                 ActionBar.DISPLAY_SHOW_TITLE |
                 ActionBar.DISPLAY_USE_LOGO);
    	
-    	
-    	// CREATE DONATE MENU
-    	MenuItem donateMenu = menu.add("Donate");
-    	donateMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-    	donateMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			public boolean onMenuItemClick(MenuItem item) {
-		    	Uri websiteUri = Uri.parse(AttaBaseContract.PAYPAL_DONATE);
-		    	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
-		    	AttaBaseContract.gaTracker.trackPageView("Donate");
-		    	startActivity(intent);
-				return true;
-			}
-		});
-    	
-    	// CREATE FEEDBACK MENU
-    	MenuItem feedBackMenu = menu.add("Feedback");
-    	feedBackMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-    	feedBackMenu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			public boolean onMenuItemClick(MenuItem item) {
-		    	Uri websiteUri = Uri.parse(AttaBaseContract.FEEDBACK_LINK);
-		    	Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
-		    	AttaBaseContract.gaTracker.trackPageView("Feedback");
-		    	startActivity(intent);
-				return true;
-			}
-		});
+
     	return super.onCreateOptionsMenu(menu);
     }
+    
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_feedback:
+			Uri websiteUri = Uri.parse(AttaBaseContract.FEEDBACK_LINK);
+			Intent intent = new Intent(Intent.ACTION_VIEW, websiteUri);
+			startActivity(intent);
+			return true;
+		case R.id.menu_donate:
+	    	Uri donateUri = Uri.parse(AttaBaseContract.PAYPAL_DONATE);
+	    	Intent donateIntent = new Intent(Intent.ACTION_VIEW, donateUri);
+	    	AttaBaseContract.gaTracker.trackPageView("Donate");
+	    	startActivity(donateIntent);
+			return true;
+		case R.id.menu_settings:
+			Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+			startActivity(settingsIntent);
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
     
     private void populateHomeScreen(){
         // LOAD LAYOUT XML    

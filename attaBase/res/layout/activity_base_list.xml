@@ -8,8 +8,8 @@
         android:id="@+id/listAnimator"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/adView" >
+        android:layout_above="@+id/adView"
+        android:layout_alignParentTop="true" >
     </ViewAnimator>
 
     <com.google.ads.AdView
@@ -18,9 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        ads:testDevices="TEST_EMULATOR, D70A6F2CF0D1D138E38C755BA0CD8022"
         ads:adSize="SMART_BANNER"
-        ads:adUnitId="@string/pub_id"
-        ads:loadAdOnCreate="true" />
+        ads:adUnitId="@string/pub_id" />
 
 </RelativeLayout>

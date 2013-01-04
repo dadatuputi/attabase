@@ -47,7 +47,8 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/adView"
         android:onClick="initialImport"
-        android:text="@string/button_continue" />
+        android:text="@string/button_continue"
+        style="@style/BottomButton"/>
 
     <com.google.ads.AdView
         xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
@@ -56,8 +57,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         ads:adSize="SMART_BANNER"
-        ads:adUnitId="@string/pub_id"
-        ads:loadAdOnCreate="true"
-        ads:testDevices="TEST_EMULATOR, D70A6F2CF0D1D138E38C755BA0CD8022" />
+        ads:adUnitId="@string/pub_id" />
 
 </RelativeLayout>

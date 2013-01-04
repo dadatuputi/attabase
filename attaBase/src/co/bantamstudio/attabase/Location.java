@@ -1,5 +1,8 @@
 package co.bantamstudio.attabase;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -202,5 +205,24 @@ public class Location {
 
 	public Base getBase() {
 		return base;
+	}
+
+	public Set<String> getKeywords() {
+		Set<String> keywords = new HashSet<String>();
+		if (getLocationCity() != null)
+			keywords.add(getLocationCity());
+		if (getLocationCountry() != null)
+			keywords.add(getLocationCountry());
+		if (getLocationName() != null)
+			keywords.add(getLocationName());
+		if (getLocationState() != null)
+			keywords.add(getLocationState());
+		if (getLocationType() != null)
+			keywords.add(getLocationType());
+		if (getLocationZip() != null)
+			keywords.add(getLocationZip());
+		
+		return keywords;
+
 	}
 }
