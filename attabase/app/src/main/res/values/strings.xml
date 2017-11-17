@@ -1,0 +1,149 @@
+<resources>
+    <string name="app_name">AttaBase</string>
+    <string name="title_activity_main">AttaBase</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!--Menu Strings-->
+    <string name="menu_donate_title">Donate</string>
+    <string name="menu_title_feedback">Feedback</string>
+    <string name="menu_title_settings">Settings</string>
+
+
+    <!--Simple Strings-->
+    <string name="yes">Yes</string>
+    <string name="ok">OK</string>
+
+    <string name="first_run_msg">Would you like to set your default service and base location now?\nYou will have an opportunity to select these later if you would like.</string>
+    <string name="title_activity_show_all_entries">attaBase Initial Import</string>
+    <string name="importing">We are performing the initial import of the base data. This may take several minutes, depending on your phone (there are approximately 15k locations to import). This only needs to be performed once.</string>
+    <string name="bases">Bases Imported:</string>
+    <string name="locations">Locations Imported: </string>
+    <string name="zero">0</string>
+    <string name="initial_import_completed">Initial Import Completed</string>
+    <string name="start_screen_uninitialized">We need to perform an initial import. Tap &quot;Continue&quot; below to import the DoD data.</string>
+    <string name="button_import">Import</string>
+    <string name="button_continue">Continue</string>
+    <string name="import_completed_message">Initial import completed. Please continue.</string>
+    <string name="title_base_detail">Base Detail</string>
+    <string name="title_base_list">Bases</string>
+    <string name="title_activity_activity_base_viewer">ActivityBaseViewer</string>
+    <string name="title_activity_activity_wizard">ActivityWizard</string>
+    <string name="title_activity_activity_action_bar">ActivityActionBar</string>
+    <string name="home_base">Home Base</string>
+    <string name="address">Address</string>
+    <string name="phone">Phone</string>
+    <string name="website">Website</string>
+    <string name="browse_all_locations">Browse All Locations</string>
+    <string name="welcome">Welcome to AttaBase!</string>
+    <string name="attabase_import">AttaBase Import</string>
+    <string name="wizard">AttaBase Wizard</string>
+    <string name="select_service">Select a default service</string>
+    <string name="wizard_text_1">Selecting a default service will allow attaBase to tailor your experience. Don\'t worry, you can still browse all services with a default service selected.</string>
+    <string name="wizard_1">AttaBase Wizard: Step 1</string>
+    <string name="wizard_2">AttaBase Wizard: Step 2</string>
+    <string name="select_base">Select a default base</string>
+    <string name="wizard_text_2">Select a base to show when you start attaBase. You may still browse all other bases after setting your default base.</string>
+    <string name="wizard_3">AttaBase Wizard: Completed</string>
+    <string name="wizard_finished">You\'re finished!</string>
+    <string name="wizard_text_3">You may now enjoy using attaBase. You may change your home base or service by browsing and selecting the \"Set default\" option in the toolbar.</string>
+    <string name="filter_hint">Type here to filter&#8230;</string>
+    <string name="fax">Fax: </string>
+    <string name="dsn">"DSN: "</string>
+    <string name="dsn_fax">"DSN Fax: "</string>
+    <string name="select_service_query_title">Select defaults?</string>
+    <string name="noBaseText">No base has been set. To set a base, click the flag button when browsing.</string>
+    <string name="button_home_description">Home Button</string>
+    <string name="image_bookmark">Bookmark Icon</string>
+    <string name="button_compass_description">Compass Button</string>
+    <string name="button_phone_description">Phone Button</string>
+    <string name="button_maps_description">Maps Button</string>
+    <string name="pub_id">a150e641291898c</string>
+    <string name="cd_right_arrow">right arrow</string>
+    <string name="cd_service_icon">service icon</string>
+    <string name="ad_alert_dialog">If you find attaBase useful, please consider donating. Even $1 helps the developer continue improving this app. Click &quot;OK&quot; to donate or &quot;Cancel&quot; to donate later.</string>
+    <string name="ad_alert_dialog_title">Consider Donating</string>
+    <string name="alert_dialog_ok">OK</string>
+    <string name="alert_dialog_cancel">Cancel</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+    <!-- General settings -->
+    <string name="pref_header_general">General</string>
+    <string name="pref_title_disable_ads">Disable Ads</string>
+    <string name="pref_description_disable_ads">Consider donating if you like attaBase</string>
+    <string name="title_activity_wizard">First Time Use Wizard</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_settings2">Settings</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+
+
+</resources>
